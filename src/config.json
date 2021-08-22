@@ -21,7 +21,7 @@
       "notes": "notes.html",
       "panzooms": "panzooms.xml",
       "polls": "polls.json",
-      "externalVideos": "external_videos.json",
+      "externalVideos": "external_videos.xml",
       "screenshare": "deskshare.xml",
       "shapes": "shapes.svg"
     }
