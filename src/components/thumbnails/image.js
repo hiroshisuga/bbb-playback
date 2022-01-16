@@ -30,6 +30,16 @@ const Image = ({
     );
   }
 
+  const external_video = src === ID.EXTERNAL_VIDEOS;
+
+  if (video) {
+    return (
+      <div className={cx('thumbnail-image', { video })}>
+        <span className="icon-video" />
+      </div>
+    );
+  }
+  
   const logo = src.includes('logo');
 
   return (
