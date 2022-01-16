@@ -25,7 +25,7 @@
     "polls": "polls.json",
     "screenshare": "deskshare.xml",
     "shapes": "shapes.svg",
-    "videos": "external_videos.json"
+    "videos": "external_videos.xml"
   },
   "locale": {
     "default": "en"
