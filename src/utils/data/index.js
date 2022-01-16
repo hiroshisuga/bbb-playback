@@ -67,9 +67,16 @@ const getCurrentContent = (time) => {
   const {
     SCREENSHARE,
     PRESENTATION,
+    EXTERNAL_VIDEOS,
   } = ID;
 
-  const content = isEnabled(storage.screenshare, time) ? SCREENSHARE : PRESENTATION;
+  let content=PRESENTATION;
+  
+  if (isEnabled(screenshare, time)) {
+    content=SCREENSHARE;
+  } else if (isEnabled(externalVideos, time)) {
+    content=EXTERNAL_VIDEOS;
+  }
 
   return content;
 };
