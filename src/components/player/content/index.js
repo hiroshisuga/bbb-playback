@@ -2,6 +2,7 @@ import React from 'react';
 import cx from 'classnames';
 import Presentation from 'components/presentation';
 import Screenshare from 'components/screenshare';
+import ExternalVideoPlayer from 'components/external-video-player';
 import Thumbnails from 'components/thumbnails';
 import FullscreenButton from 'components/player/buttons/fullscreen';
 import { LAYOUT } from 'utils/constants';
@@ -29,6 +30,7 @@ const Content = ({
       <div className="top-content">
         <Presentation />
         {layout.screenshare ? <Screenshare /> : null}
+        {layout.externalvideoplayer ? <ExternalVideoPlayer /> : null}
       </div>
       <div className={cx('bottom-content', { 'inactive': fullscreen })}>
         <Thumbnails
