@@ -36,10 +36,14 @@ const EVENTS = [
 ];
 
 export default class Synchronizer {
-  constructor(primary, secondary) {
+  constructor(primary, secondary, externalVideos = null) {
     this.primary = primary;
     this.secondary = secondary;
 
+    if (externalVideos) {
+      this.externalVideos = externalVideos;  
+    }
+    
     this.status = {
       primary: 'waiting',
       secondary: 'waiting',
@@ -50,6 +54,15 @@ export default class Synchronizer {
     this.init();
   }
 
+  syncVolume() {
+    const volume = this.primary.volume();
+    const muted = this.primary.muted();
+
+    if (this.externalVideos) {
+      this.externalVideos.handleVolumeChange(volume,muted);
+    }
+  }
+  
   init() {
     STATUSES.forEach(status => {
       this.primary.on(status, () => this.status.primary = status);
@@ -69,6 +82,8 @@ export default class Synchronizer {
       this.secondary.playbackRate(playbackRate);
     });
 
+    this.primary.on('volumechange', () => this.syncVolume());
+    
     this.primary.on('waiting', () => {
       if (!this.synching && this.status.secondary === 'canplay') {
         this.synching = true;
