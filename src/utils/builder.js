@@ -190,8 +190,7 @@ const buildSlides = image => {
       timestamps.forEach(timestamp => {
         slides.push({
           id: slideId,
-          fullId: attr.id,
-          //height: parseInt(attr.height),
+          fullId: img._id,
           height: parseInt(img._height),
           src,
           timestamp,
