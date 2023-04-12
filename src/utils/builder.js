@@ -185,7 +185,8 @@ const buildSlides = image => {
       timestamps.forEach(timestamp => {
         slides.push({
           id: slideId,
-          fullId: attr.id,
+          //fullId: attr.id,
+          fullId: img._id,
           //height: parseInt(attr.height),
           height: parseInt(img._height),
           src,
