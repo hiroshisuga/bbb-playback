@@ -48,6 +48,7 @@ const ID = {
   STORAGE: 'storage',
   SWAP: 'swap',
   THUMBNAILS: 'thumbnails',
+  TLDRAW: 'tldraw',
   USERS: 'users',
   VIDEOS: 'videos',
   WEBCAMS: 'webcams',
@@ -86,6 +87,11 @@ const POSITIONS = {
   TOP: 'top',
 };
 
+const ROLES = {
+  MODERATOR: 'MODERATOR',
+  VIEWER: 'VIEWER',
+};
+
 const SHAPES = {
   CIRCLE: 'circle',
   LINE: 'line',
@@ -96,6 +102,11 @@ const SHAPES = {
   TEXT: 'text',
   MARKER: 'marker',
   ERASER: 'eraser',
+};
+
+const THEME = {
+  DARK: 'dark',
+  LIGHT: 'light',
 };
 
 const getRouter = () => {
@@ -118,6 +129,8 @@ export {
   MEDIA_ROOT_URL,
   NUMBERS,
   POSITIONS,
+  ROLES,
   ROUTER,
   SHAPES,
+  THEME,
 };

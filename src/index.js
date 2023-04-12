@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { IntlProvider } from "react-intl";
 import Loader from 'components/loader';
 import Router from 'components/router';
@@ -12,18 +12,18 @@ import { getStyle } from 'utils/params';
 import './index.scss';
 
 const locale = getLocale();
-const messages = getMessages();
 const style = getStyle();
 
-ReactDOM.render(
+const root = createRoot(document.getElementById('root'));
+
+root.render(
   (
     <IntlProvider
       locale={locale}
-      messages={messages[locale]}
+      messages={getMessages(locale)}
     >
       {style ? <link rel="stylesheet" type="text/css" href={style} /> : null}
       {ROUTER ? <Router /> : <Loader />}
     </IntlProvider>
-  ),
-  document.getElementById('root')
+  )
 );
