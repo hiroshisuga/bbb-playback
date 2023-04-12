@@ -100,6 +100,8 @@ const SHAPES = {
   POLYGON: 'polygon',
   POLYLINE: 'polyline',
   TEXT: 'text',
+  MARKER: 'marker',
+  ERASER: 'eraser',
 };
 
 const THEME = {
