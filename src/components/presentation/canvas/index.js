@@ -1,5 +1,7 @@
 import React from 'react';
 import Poll from './poll';
+import Marker from './marker';
+import Eraser from './eraser';
 import { useCurrentInterval } from 'components/utils/hooks';
 import { SHAPES } from 'utils/constants';
 import storage from 'utils/data/storage';
@@ -111,6 +113,22 @@ const Canvas = () => {
               {data.text.split('\r').map(line => <span>{line}<br /></span>)}
             </div>
           </foreignObject>
+        );
+        break;
+      case SHAPES.MARKER:
+        canvas.push(
+          <Marker
+            data={data}
+            style={style}
+          />
+        );
+        break;
+      case SHAPES.ERASER:
+        canvas.push(
+          <Eraser
+            data={data}
+            style={style}
+          />
         );
         break;
       default:

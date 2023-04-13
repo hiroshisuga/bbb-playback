@@ -190,6 +190,7 @@ const buildSlides = image => {
       timestamps.forEach(timestamp => {
         slides.push({
           id: slideId,
+          fullId: img._id,
           height: parseInt(img._height),
           src,
           timestamp,
@@ -266,6 +267,17 @@ const buildCanvases = (group, slides) => {
           } else {
             shape.data = Object.assign({ image });
           }
+        } else if (g.path && g.mask && g.use) {
+          shape.type = SHAPES.MARKER;
+          const path = g.path;
+          const mask = g.mask;
+          const use = g.use;
+          shape.data = Object.assign({ path }, { mask }, { use } );
+        } else if (g.clipPath && g.use) {
+          shape.type = SHAPES.ERASER;
+          const clipPath = g.clipPath;
+          const use = g.use;
+          shape.data = Object.assign({ clipPath }, { use });
         } else if (g.polyline) {
           shape.type = SHAPES.POLYLINE;
           shape.data = Object.assign({}, g.polyline);
