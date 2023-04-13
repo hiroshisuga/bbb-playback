@@ -1,5 +1,7 @@
 import React from 'react';
 import Poll from './poll';
+import Marker from './marker';
+import Eraser from './eraser';
 import { useCurrentInterval } from 'components/utils/hooks';
 import { SHAPES } from 'utils/constants';
 import storage from 'utils/data/storage';
@@ -115,41 +117,18 @@ const Canvas = () => {
         break;
       case SHAPES.MARKER:
         canvas.push(
-          <g>
-            <path
-              d={data.path.d}
-              style={data.pathStyle}
-            />
-            <mask
-              id={data.mask.id}
-            >
-              <path
-                d={data.maskPath.d}
-                style={data.maskPathStyle}
-              />
-            </mask>
-            <use
-              mask={data.use['mask']}
-              xlinkHref={data.use['xlink:href']}
-            />
-          </g>
+          <Marker
+            data={data}
+            style={style}
+          />
         );
         break;
       case SHAPES.ERASER:
         canvas.push(
-          <g style={style}>
-            <clipPath
-              id={data.clipPath.id}
-            >
-              <path
-                d={data.path.d}
-              />
-            </clipPath>
-            <use
-              clip-path={data.use['clip-path']}
-              xlinkHref={data.use['xlink:href']}
-            />
-          </g>
+          <Eraser
+            data={data}
+            style={style}
+          />
         );
         break;
       default:
