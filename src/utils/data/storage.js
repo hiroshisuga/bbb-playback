@@ -165,7 +165,7 @@ const storage = {
       videos: hasProperty(DATA, ID.VIDEOS),
       presentation: hasProperty(DATA, ID.SHAPES),
       screenshare: hasProperty(DATA, ID.SCREENSHARE),
-      external_videos: hasProperty(DATA, ID.EXTERNAL_VIDEOS),
+      externalVideos: hasProperty(DATA, ID.EXTERNAL_VIDEOS),
     };
   },
   get content() {
@@ -177,7 +177,7 @@ const storage = {
       videos: !isEmpty(this.videos),
       presentation: hasPresentation(this.slides),
       screenshare: !isEmpty(this.screenshare),
-      external_videos: !isEmpty(this.external_videos),
+      externalVideos: !isEmpty(this.external_videos),
     };
   },
   get alternates() {
