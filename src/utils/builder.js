@@ -221,6 +221,12 @@ const buildThumbnails = slides => {
         src: ID.SCREENSHARE,
         timestamp,
       });
+    } else if (src.includes(ID.EXTERNAL_VIDEOS)) {
+        result.push({
+          id,
+          src: ID.EXTERNAL_VIDEOS,
+          timestamp,
+        });
     } else {
       result.push({
         id,
@@ -487,6 +493,34 @@ const buildScreenshare = result => {
   return data;
 };
 
+const buildExternalVideos = result => {
+  let data = [];
+  const { recording } = result;
+
+  if (hasProperty(recording, 'video')) {
+    data = recording.video.map(video => {
+      const attr = getAttr(video);
+      return {
+        timestamp: parseFloat(attr.start_timestamp),
+        clear: parseFloat(attr.stop_timestamp),
+        url: attr.url,
+        events: video.event.map(event => { 
+          const attr = getAttr(event);
+          return {
+            timestamp: parseFloat(attr.timestamp),
+            type: attr.type,
+            time: attr.time,
+            rate: parseFloat(attr.rate),
+            playing: (attr.playing === 'true'),
+          }
+        })
+      };
+    });
+  }
+
+  return data;
+};
+
 const build = (filename, value) => {
   return new Promise((resolve, reject) => {
     let data;
@@ -552,6 +586,9 @@ const build = (filename, value) => {
             break;
           case config.screenshare:
             data = buildScreenshare(result);
+            break;
+          case config.externalVideos:
+            data = buildExternalVideos(result);
             break;
           case config.shapes:
             data = buildShapes(result);
