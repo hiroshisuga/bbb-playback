@@ -39,4 +39,6 @@
   "player.search.modal.subtitle": "Find presentation slides content",
   "player.thumbnails.wrapper.aria": "Thumbnails area",
   "player.webcams.wrapper.aria": "Webcams area"
+  "player.video.wrapper.aria": "Video area",
+  "player.externalVideo.autoPlayWarning": "We need your permission for playing audio"
 }
