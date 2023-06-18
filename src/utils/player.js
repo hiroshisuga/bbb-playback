@@ -11,6 +11,9 @@ const player = {
   get screenshare() {
     return PLAYERS[ID.SCREENSHARE];
   },
+  get exernal_videos() {
+    return PLAYERS[ID.EXTERNAL_VIDEOS];
+  },
   get synchronizer() {
     return SYNCHRONIZER;
   },
@@ -20,8 +23,18 @@ const player = {
   set screenshare(value) {
     if (!PLAYERS[ID.SCREENSHARE]) PLAYERS[ID.SCREENSHARE] = value;
 
-    if (this.webcams) {
-      this.synchronizer = new Synchronizer(this.webcams, this.screenshare);
+    if (this.external_videos.length === 0) {
+      if (this.webcams) {
+        this.synchronizer = new Synchronizer(this.webcams, this.screenshare);
+      }
+    } else {
+      if (this.webcams) {
+        if (this.webcams && this.screenshare && this.external_videos) {
+          this.synchronizer = new Synchronizer(this.webcams, this.screenshare, this.external_videos);
+        } 
+      } else {
+        this.synchronizer = new Synchronizer(this.screenshare, this.external_videos);
+      }
     }
   },
   set synchronizer(value) {
@@ -30,8 +43,18 @@ const player = {
   set webcams(value) {
     if (!PLAYERS[ID.WEBCAMS]) PLAYERS[ID.WEBCAMS] = value;
 
-    if (this.screenshare) {
-      this.synchronizer = new Synchronizer(this.webcams, this.screenshare);
+    if (this.external_videos.length === 0) {
+      if (this.screenshare) {
+        this.synchronizer = new Synchronizer(this.webcams, this.screenshare);
+      }
+    } else {
+      if (this.screenshare) {
+        if (this.webcams && this.screenshare && this.external_videos) {
+          this.synchronizer = new Synchronizer(this.webcams, this.screenshare, this.external_videos);
+        } 
+      } else {
+        this.synchronizer = new Synchronizer(this.webcams, this.external_videos);
+      }
     }
   },
 };
