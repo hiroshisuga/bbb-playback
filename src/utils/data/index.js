@@ -72,9 +72,9 @@ const getCurrentContent = (time) => {
   
   let content=PRESENTATION;
 
-  if (isEnabled(screenshare, time)) {
+  if (isEnabled(storage.screenshare, time)) {
     content=SCREENSHARE;
-  } else if (isEnabled(externalVideos, time)) {
+  } else if (isEnabled(storage.externalVideos, time)) {
     content=EXTERNAL_VIDEOS;
   }
 
