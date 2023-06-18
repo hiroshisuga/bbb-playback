@@ -3,6 +3,7 @@ import cx from 'classnames';
 import Presentation from 'components/presentation';
 import TldrawPresentation from 'components/tldraw';
 import Screenshare from 'components/screenshare';
+import ExternalVideoPlayer from 'components/external-video-player';
 import Thumbnails from 'components/thumbnails';
 import FullscreenButton from 'components/player/buttons/fullscreen';
 import { LAYOUT } from 'utils/constants';
@@ -35,6 +36,7 @@ const Content = ({
       <div className="top-content">
         {isTldrawWhiteboard ? <TldrawPresentation /> : <Presentation />}
         {layout.screenshare ? <Screenshare /> : null}
+        {layout.externalVideo ? <ExternalVideoPlayer /> : null}
       </div>
       <div className={cx('bottom-content', { 'inactive': fullscreen })}>
         <Thumbnails
