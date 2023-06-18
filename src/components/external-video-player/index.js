@@ -215,9 +215,104 @@ class ExternalVideoPlayer extends Component {
   }
 
   orchestrator () {
-    const { events, active, getCurrentPlayerTime  } = this.props;
+    const { events, active, primaryPlaybackRate } = this.props;
     const { playing, playbackRate } = this.state;
 
-    this.time = getCurrentPlayerTime();
-
     let primaryPlayerPlaying = true;
+
+    if (this.time === this.lastTime) {
+      primaryPlayerPlaying = false;
+    }
+
+    this.lastTime = this.time;
+    this.primaryPlayerPlaying = primaryPlayerPlaying;
+
+    if (active && !this.hasPlayedBefore && !this.autoPlayTimeout) {
+       this.autoPlayTimeout = setTimeout(this.autoPlayBlockDetected, AUTO_PLAY_BLOCK_DETECTION_TIMEOUT_SECONDS * 1000);
+    }
+
+    const index = getCurrentDataIndex(events, this.time);
+
+    logger.debug(`external_video: player time=${this.time} active=${active} Playing=${playing} primaryPlayerPlaying=${primaryPlayerPlaying} PlaybackRate=${playbackRate}`);
+
+
+    if (!primaryPlayerPlaying || !active) {
+      this.handleOnPause();
+      this.playerUpdateTime = -1;
+      return
+    }
+
+    if (index && events && events[index] && events[index].type)
+    {
+        const {type, time, rate, playing}  = events[index];
+
+        logger.debug(`External Video Event: type=${type} time=${time} rate=${rate} playing=${playing}`);
+
+        switch (type) {
+          case "stop":
+             this.handleOnPause();
+             break;
+          case "play":
+             this.handleOnPlay();
+             break;
+          case "playerUpdate":
+              if (this.playerUpdateTime !== time) {
+                this.lastEventPlaybackRate=rate;
+                this.seekTo(time);
+                playing ? this.handleOnPlay() : this.handleOnPause()
+                this.playerUpdateTime=time;
+              } 
+              break;
+          default:
+          ;
+        }
+    }
+
+    this.setPlaybackRate();
+  }
+
+
+  render() {
+
+    const { videoUrl, active, intl } = this.props;
+    const { playing, playbackRate, muted, autoPlayBlocked, volume } = this.state;
+
+    return (
+
+      <div 
+          className={cx('externalVideos-wrapper', { inactive: !active })}
+          ref={(ref) => { this.playerParent = ref; }}
+      >
+        {autoPlayBlocked
+          ? (
+            <p className="autoPlayWarning">
+              {intl.formatMessage(intlMessages.autoPlayWarning)}
+            </p>
+          )
+          : ''
+        }
+
+        <ReactPlayer
+          url={videoUrl}
+          config={this.opts}
+          volume={volume}
+          muted={muted}
+          playing={playing}
+          playbackRate={playbackRate}
+          onReady={this.handleOnReady}
+          onPlay={this.handleOnPlay}
+          onPause={this.handleOnPause}
+          onBuffer={this.handleOnBuffer}
+          onBufferEnd={this.handleOnBufferEnd}
+          ref={(ref) => { this.player = ref; }}
+          width="100%"
+          height="100%"
+        />
+
+      </div>
+    );
+
+  }
+}
+
+export default (ExternalVideoPlayer);
