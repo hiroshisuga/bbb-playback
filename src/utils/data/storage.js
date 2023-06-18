@@ -165,6 +165,7 @@ const storage = {
       videos: hasProperty(DATA, ID.VIDEOS),
       presentation: hasProperty(DATA, ID.SHAPES),
       screenshare: hasProperty(DATA, ID.SCREENSHARE),
+      external_videos: hasProperty(DATA, ID.EXTERNAL_VIDEOS),
     };
   },
   get content() {
@@ -176,6 +177,7 @@ const storage = {
       videos: !isEmpty(this.videos),
       presentation: hasPresentation(this.slides),
       screenshare: !isEmpty(this.screenshare),
+      external_videos: !isEmpty(this.external_videos),
     };
   },
   get alternates() {
@@ -221,6 +223,9 @@ const storage = {
   },
   get screenshare() {
     return DATA[ID.SCREENSHARE];
+  },
+  get external_videos() {
+    return DATA[ID.EXTERNAL_VIDEOS];
   },
   get shapes() {
     return DATA[ID.SHAPES];
