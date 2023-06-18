@@ -66,10 +66,17 @@ const getBar = (percentage) => {
 const getCurrentContent = (time) => {
   const {
     SCREENSHARE,
+    EXTERNAL_VIDEOS,
     PRESENTATION,
   } = ID;
+  
+  let content=PRESENTATION;
 
-  const content = isEnabled(storage.screenshare, time) ? SCREENSHARE : PRESENTATION;
+  if (isEnabled(screenshare, time)) {
+    content=SCREENSHARE;
+  } else if (isEnabled(externalVideos, time)) {
+    content=EXTERNAL_VIDEOS;
+  }
 
   return content;
 };
