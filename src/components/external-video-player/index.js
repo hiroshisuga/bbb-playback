@@ -5,6 +5,7 @@ import { defineMessages } from 'react-intl';
 import logger from 'utils/logger';
 import { ID } from 'utils/constants';
 import { getCurrentDataIndex } from 'utils/data';
+import player from 'utils/player';
 
 import './styles.css';
 
@@ -96,7 +97,13 @@ class ExternalVideoPlayer extends Component {
     this.orchestrator = this.orchestrator.bind(this);
     this.autoPlayBlockDetected = this.autoPlayBlockDetected.bind(this);
 
+    //this.dispatchTimeUpdate = this.dispatchTimeUpdate.bind(this);
   }
+
+  //dispatchTimeUpdate = (time) => {
+  //  const event = new CustomEvent(EVENTS.TIME_UPDATE, { detail: { time }});
+  //  document.dispatchEvent(event);
+  //};
 
   autoPlayBlockDetected() {
     this.setState({ autoPlayBlocked: true });
@@ -153,9 +160,9 @@ class ExternalVideoPlayer extends Component {
     this.playerIsReady = true;
     this.handleFirstPlay();
 
-    const { onPlayerReady } = this.props;
+    //const { onPlayerReady } = this.props;
 
-    if (onPlayerReady) onPlayerReady(ID.EXTERNAL_VIDEOS, this);
+    //if (onPlayerReady) onPlayerReady(ID.EXTERNAL_VIDEOS, this);
 
 
   }
@@ -215,10 +222,14 @@ class ExternalVideoPlayer extends Component {
   }
 
   orchestrator () {
-    const { events, active, primaryPlaybackRate } = this.props;
+    const { events, active, getCurrentPlayerTime, primaryPlaybackRate } = this.props;
     const { playing, playbackRate } = this.state;
 
+    this.time = player.primary.currentTime();
+    
     let primaryPlayerPlaying = true;
+
+    this.handleVolumeChange(player.primary.volume(), player.primary.muted());
 
     if (this.time === this.lastTime) {
       primaryPlayerPlaying = false;
@@ -304,7 +315,7 @@ class ExternalVideoPlayer extends Component {
           onPause={this.handleOnPause}
           onBuffer={this.handleOnBuffer}
           onBufferEnd={this.handleOnBufferEnd}
-          ref={(ref) => { this.player = ref; }}
+          ref={(ref) => { this.player = ref; if (!player.external_videos) {player.external_videos = this.player; } }}
           width="100%"
           height="100%"
         />
