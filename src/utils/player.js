@@ -11,7 +11,7 @@ const player = {
   get screenshare() {
     return PLAYERS[ID.SCREENSHARE];
   },
-  get exernal_videos() {
+  get external_videos() {
     return PLAYERS[ID.EXTERNAL_VIDEOS];
   },
   get synchronizer() {
@@ -23,7 +23,7 @@ const player = {
   set screenshare(value) {
     if (!PLAYERS[ID.SCREENSHARE]) PLAYERS[ID.SCREENSHARE] = value;
 
-    if (this.external_videos.length === 0) {
+    if (!this.external_videos || this.external_videos.length === 0) {
       if (this.webcams) {
         this.synchronizer = new Synchronizer(this.webcams, this.screenshare);
       }
@@ -33,7 +33,24 @@ const player = {
           this.synchronizer = new Synchronizer(this.webcams, this.screenshare, this.external_videos);
         } 
       } else {
-        this.synchronizer = new Synchronizer(this.screenshare, this.external_videos);
+        this.synchronizer = new Synchronizer(null, this.screenshare, this.external_videos);
+      }
+    }
+  },
+  set external_videos(value) {
+    if (!PLAYERS[ID.EXTERNAL_VIDEOS]) PLAYERS[ID.EXTERNAL_VIDEOS] = value;
+
+    if (!this.webcams || this.webcams.length === 0) {
+      if (this.screenshare) {
+        this.synchronizer = new Synchronizer(null, this.screenshare, this.external_videos);
+      }
+    } else {
+      if (this.screenshare) {
+        if (this.webcams && this.screenshare && this.external_videos) {
+          this.synchronizer = new Synchronizer(this.webcams, this.screenshare, this.external_videos);
+        } 
+      } else {
+        this.synchronizer = new Synchronizer(this.webcams, null, this.external_videos);
       }
     }
   },
@@ -43,7 +60,7 @@ const player = {
   set webcams(value) {
     if (!PLAYERS[ID.WEBCAMS]) PLAYERS[ID.WEBCAMS] = value;
 
-    if (this.external_videos.length === 0) {
+    if (!this.external_videos || this.external_videos?.length === 0) {
       if (this.screenshare) {
         this.synchronizer = new Synchronizer(this.webcams, this.screenshare);
       }
@@ -53,7 +70,7 @@ const player = {
           this.synchronizer = new Synchronizer(this.webcams, this.screenshare, this.external_videos);
         } 
       } else {
-        this.synchronizer = new Synchronizer(this.webcams, this.external_videos);
+        this.synchronizer = new Synchronizer(this.webcams, null, this.external_videos);
       }
     }
   },
