@@ -12,6 +12,7 @@ const player = {
     return PLAYERS[ID.SCREENSHARE];
   },
   get external_videos() {
+    //Not really used..
     return PLAYERS[ID.EXTERNAL_VIDEOS];
   },
   get synchronizer() {
@@ -38,6 +39,7 @@ const player = {
     }
   },
   set external_videos(value) {
+    //Not really used..
     if (!PLAYERS[ID.EXTERNAL_VIDEOS]) PLAYERS[ID.EXTERNAL_VIDEOS] = value;
 
     if (!this.webcams || this.webcams.length === 0) {
