@@ -30,7 +30,6 @@ const Image = ({
     );
   }
 
-  //Currently not implemented
   const external_video = src === ID.EXTERNAL_VIDEOS;
 
   if (external_video) {
