@@ -72,10 +72,10 @@ const layout = {
     return this.content.screenshare;
   },
   get external_videos() {
-    return this.content.external_videos;
+    return this.content.externalVideos;
   },
   get single() {
-    return !this.content.presentation && !this.content.screenshare && !this.content.external_videos;
+    return !this.content.presentation && !this.content.screenshare && !this.content.externalVideos;
   },
   hasFullscreenButton: function (content, swap) {
     if (!this.control || !controls.fullscreen) return false;
