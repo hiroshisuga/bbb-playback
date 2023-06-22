@@ -222,7 +222,6 @@ const buildThumbnails = slides => {
         timestamp,
       });
     } else if (src.includes(ID.EXTERNAL_VIDEOS)) {
-      //Currently not implemented
         result.push({
           id,
           src: ID.EXTERNAL_VIDEOS,
