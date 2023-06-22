@@ -221,12 +221,12 @@ const buildThumbnails = slides => {
         src: ID.SCREENSHARE,
         timestamp,
       });
-    } else if (src.includes(ID.EXTERNAL_VIDEOS)) {
+    /*} else if (src.includes(ID.EXTERNAL_VIDEOS)) {
         result.push({
           id,
           src: ID.EXTERNAL_VIDEOS,
           timestamp,
-        });
+        });*/
     } else {
       result.push({
         id,
