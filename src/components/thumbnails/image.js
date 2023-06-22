@@ -29,7 +29,7 @@ const Image = ({
       </div>
     );
   }
-  
+/*
   const external_video = src === ID.EXTERNAL_VIDEOS;
 
   if (external_video) {
@@ -39,7 +39,7 @@ const Image = ({
       </div>
     );
   }
-
+*/
   const logo = src.includes('logo');
 
   return (
