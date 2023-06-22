@@ -498,20 +498,21 @@ const buildExternalVideos = result => {
   const { recording } = result;
 
   if (hasProperty(recording, 'video')) {
-    data = recording.video.map(video => {
-      const attr = getAttr(video);
+    const v = recording.video;
+    const videos = Array.isArray(v) ? v : [v];
+    data = videos.map(video => {
       return {
-        timestamp: parseFloat(attr.start_timestamp),
-        clear: parseFloat(attr.stop_timestamp),
-        url: attr.url,
+        timestamp: parseFloat(video._start_timestamp),
+        clear: parseFloat(video._stop_timestamp),
+        url: video._url,
         events: video.event.map(event => { 
-          const attr = getAttr(event);
+          //const attr = getAttr(event);
           return {
-            timestamp: parseFloat(attr.timestamp),
-            type: attr.type,
-            time: attr.time,
-            rate: parseFloat(attr.rate),
-            playing: (attr.playing === 'true'),
+            timestamp: parseFloat(event._timestamp),
+            type: event._type,
+            time: event._time,
+            rate: parseFloat(event._rate),
+            playing: (event._playing === 'true'),
           }
         })
       };
