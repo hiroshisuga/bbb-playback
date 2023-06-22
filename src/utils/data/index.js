@@ -74,7 +74,7 @@ const getCurrentContent = (time) => {
 
   if (isEnabled(storage.screenshare, time)) {
     content=SCREENSHARE;
-  } else if (isEnabled(storage.externalVideos, time)) {
+  } else if (isEnabled(storage.external_videos, time)) {
     content=EXTERNAL_VIDEOS;
   }
 
