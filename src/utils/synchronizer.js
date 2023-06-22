@@ -73,6 +73,7 @@ export default class Synchronizer {
   }
 
   init() {
+   if (this.secondary) {
     STATUSES.forEach(status => {
       this.primary.on(status, () => this.status.primary = status);
       this.secondary.on(status, () => this.status.secondary = status);
@@ -137,5 +138,6 @@ export default class Synchronizer {
       this.primary.on(event, () => logger.debug(`primary ${event} ${this.status.primary}`));
       this.secondary.on(event, () => logger.debug(`secondary ${event} ${this.status.secondary}`));
     });
+   }
   }
 }
