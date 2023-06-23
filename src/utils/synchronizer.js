@@ -36,9 +36,13 @@ const EVENTS = [
 ];
 
 export default class Synchronizer {
-  constructor(primary, secondary) {
+  constructor(primary, secondary, externalVideos = null) {
     this.primary = primary;
     this.secondary = secondary;
+
+    if (externalVideos) {
+      this.externalVideos = externalVideos;  
+    }
 
     this.status = {
       primary: 'waiting',
@@ -50,7 +54,26 @@ export default class Synchronizer {
     this.init();
   }
 
+  syncVolume() {
+    const volume = this.primary.volume();
+    const muted = this.primary.muted();
+
+    if (this.externalVideos) {
+      this.externalVideos.handleVolumeChange(volume,muted);
+    }
+  }
+
+   handleUpdateTime() {
+    const currentTime = this.primary.currentTime();
+
+    if (this.externalVideos && this.externalVideos.time !== currentTime)
+    {
+      this.externalVideos.time = currentTime;
+    }
+  }
+
   init() {
+   if (this.secondary) {
     STATUSES.forEach(status => {
       this.primary.on(status, () => this.status.primary = status);
       this.secondary.on(status, () => this.status.secondary = status);
@@ -68,6 +91,10 @@ export default class Synchronizer {
       const playbackRate = this.primary.playbackRate();
       this.secondary.playbackRate(playbackRate);
     });
+
+    this.primary.on('volumechange', () => this.syncVolume());
+
+    this.primary.on('timeupdate', () => this.handleUpdateTime());
 
     this.primary.on('waiting', () => {
       if (!this.synching && this.status.secondary === 'canplay') {
@@ -111,5 +138,6 @@ export default class Synchronizer {
       this.primary.on(event, () => logger.debug(`primary ${event} ${this.status.primary}`));
       this.secondary.on(event, () => logger.debug(`secondary ${event} ${this.status.secondary}`));
     });
+   }
   }
 }
