@@ -60,16 +60,23 @@ const Content = ({
     const url = video.url
     const events = video.events;
 
-    let primaryPlaybackRate = 1;
+    //let primaryPlaybackRate = 1;
+    //let primaryPlaybackVolume = 1;
+    //let primaryPlaybackMuted = false;
 /*
     if (player.webcams)  {
        primaryPlaybackRate = player.webcams.playbackRate();
     }
 */
     // Use primary player for timing, instead of webcam player (no difference?)
+    //  -> in the end this way to pass props did not work...
+/*
     if (player.primary)  {
        primaryPlaybackRate = player.primary.playbackRate();
+       primaryPlaybackVolume = player.primary.volume();
+       primaryPlaybackMuted = player.primary.muted();
     }
+*/
     return (
       <ExternalVideoPlayer
          active={currentContent === ID.EXTERNAL_VIDEOS}
@@ -77,7 +84,9 @@ const Content = ({
          videoUrl={url}
          //onPlayerReady={this.handlePlayerReady}
          events={events}
-         primaryPlaybackRate={primaryPlaybackRate}
+         //primaryPlaybackRate={primaryPlaybackRate}
+         //primaryPlaybackVolume={primaryPlaybackVolume}
+         //primaryPlaybackMuted={primaryPlaybackMuted
          //getCurrentPlayerTime={getTime}
       />
     );
