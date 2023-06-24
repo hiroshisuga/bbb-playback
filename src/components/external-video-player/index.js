@@ -132,7 +132,8 @@ class ExternalVideoPlayer extends Component {
 
 
   setPlaybackRate(value) {
-    //The original way to get the rate from props did not work...?
+    //The original way to get the rate from props did not work,
+    // because props will not be updated after the initial rendering.
     //const { primaryPlaybackRate } = this.props;
 
     // Rate depends on primary rate player
