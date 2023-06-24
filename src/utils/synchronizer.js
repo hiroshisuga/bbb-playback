@@ -53,7 +53,7 @@ export default class Synchronizer {
 
     this.init();
   }
-
+/*
   syncVolume() {
     const volume = this.primary.volume();
     const muted = this.primary.muted();
@@ -62,7 +62,7 @@ export default class Synchronizer {
       this.externalVideos.handleVolumeChange(volume,muted);
     }
   }
-
+*/
    handleUpdateTime() {
     const currentTime = this.primary.currentTime();
 
@@ -92,7 +92,8 @@ export default class Synchronizer {
       this.secondary.playbackRate(playbackRate);
     });
 
-    this.primary.on('volumechange', () => this.syncVolume());
+    //do this at external_video-player/index.js
+    //this.primary.on('volumechange', () => this.syncVolume());
 
     this.primary.on('timeupdate', () => this.handleUpdateTime());
 
