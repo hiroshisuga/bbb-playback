@@ -69,7 +69,8 @@ const Content = ({
     }
 */
     // Use primary player for timing, instead of webcam player (no difference?)
-    //  -> in the end this way to pass props did not work...
+    //  -> in the end this way to pass props did not work,
+    //      because player/content would be rendered only once in the beginning.
 /*
     if (player.primary)  {
        primaryPlaybackRate = player.primary.playbackRate();
