@@ -226,11 +226,10 @@ class ExternalVideoPlayer extends Component {
     const { playing, playbackRate } = this.state;
 
     this.time = player.primary.currentTime();
-    
-    let primaryPlayerPlaying = true;
 
     this.handleVolumeChange(player.primary.volume(), player.primary.muted());
 
+    let primaryPlayerPlaying = true;
     if (this.time === this.lastTime) {
       primaryPlayerPlaying = false;
     }
