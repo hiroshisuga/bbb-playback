@@ -72,7 +72,7 @@ class ExternalVideoPlayer extends Component {
           autohide: 1,
           rel: 0,
           ecver: 2,
-          controls: 0,
+          controls: 1,
           enablejsapi: 0,
           showinfo: 0
         },
@@ -131,16 +131,17 @@ class ExternalVideoPlayer extends Component {
   }
 
 
-  setPlaybackRate() {
-
-    const { primaryPlaybackRate } = this.props;
+  setPlaybackRate(value) {
+    //The original way to get the rate from props did not work,
+    // because props will not be updated after the initial rendering.
+    //const { primaryPlaybackRate } = this.props;
 
     // Rate depends on primary rate player
-    const rate = primaryPlaybackRate * this.lastEventPlaybackRate;
+    const rate = value * this.lastEventPlaybackRate;
 
     const currentRate = this.state.playbackRate;
 
-    logger.debug(`external_video: setPlaybackRate current=${currentRate} primary=${primaryPlaybackRate} lastEventPlaybackRate=${this.lastEventPlaybackRate} rate=${rate}`);
+    logger.debug(`external_video: setPlaybackRate current=${currentRate} primary=${value} lastEventPlaybackRate=${this.lastEventPlaybackRate} rate=${rate}`);
 
     if (currentRate === rate) {
       return;
@@ -222,18 +223,18 @@ class ExternalVideoPlayer extends Component {
   }
 
   orchestrator () {
-    const { events, active, /*getCurrentPlayerTime,*/ primaryPlaybackRate } = this.props;
+    const { events, active/*, primaryPlaybackRate, primaryPlaybackVolume, primaryPlaybackMuted*/ } = this.props;
     const { playing, playbackRate } = this.state;
 
     this.time = player.primary.currentTime();
-    
+
     let primaryPlayerPlaying = true;
-
-    this.handleVolumeChange(player.primary.volume(), player.primary.muted());
-
     if (this.time === this.lastTime) {
       primaryPlayerPlaying = false;
     }
+
+    //this.handleVolumeChange(primaryPlaybackVolume, primaryPlaybackMuted); // did not work...?
+    this.handleVolumeChange(player.primary.volume(), player.primary.muted());
 
     this.lastTime = this.time;
     this.primaryPlayerPlaying = primaryPlayerPlaying;
@@ -279,7 +280,8 @@ class ExternalVideoPlayer extends Component {
         }
     }
 
-    this.setPlaybackRate();
+    //this.setPlaybackRate();
+    this.setPlaybackRate(player.primary.playbackRate());
   }
 
 
