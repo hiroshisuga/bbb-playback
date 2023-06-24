@@ -72,7 +72,7 @@ class ExternalVideoPlayer extends Component {
           autohide: 1,
           rel: 0,
           ecver: 2,
-          controls: 0,
+          controls: 1,
           enablejsapi: 0,
           showinfo: 0
         },
