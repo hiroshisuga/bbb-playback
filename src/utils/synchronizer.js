@@ -80,8 +80,9 @@ export default class Synchronizer {
       }
     });
 
-    this.primary.on('play', () => this.secondary.play());
+
     if (this.secondary) {
+      this.primary.on('play', () => this.secondary.play());
       this.primary.on('pause', () => this.secondary.pause());
     }
 
