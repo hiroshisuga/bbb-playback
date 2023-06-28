@@ -250,12 +250,12 @@ class ExternalVideoPlayer extends Component {
        this.autoPlayTimeout = setTimeout(this.autoPlayBlockDetected, AUTO_PLAY_BLOCK_DETECTION_TIMEOUT_SECONDS * 1000);
     }
 
+    const index = getCurrentDataIndex(events, this.time);
+
     if (active) {
       const currentVideo = this.whichVideo(videos, this.time);
       this.setState({ urlPlayed: currentVideo });
     }
-
-    const index = getCurrentDataIndex(events, this.time);
 
     logger.debug(`external_video: player url=${currentVideo} time=${this.time} active=${active} Playing=${playing} primaryPlayerPlaying=${primaryPlayerPlaying} PlaybackRate=${playbackRate}`);
 
@@ -300,6 +300,11 @@ class ExternalVideoPlayer extends Component {
 
     const { /*videoUrl,*/ active, intl } = this.props;
     const { playing, playbackRate, muted, autoPlayBlocked, volume, urlPlayed } = this.state;
+
+    if (urlPlayed == "") {
+      const currentVideo = this.whichVideo(videos, this.time);
+      this.setState({ urlPlayed: currentVideo });
+    }
 
     return (
 
