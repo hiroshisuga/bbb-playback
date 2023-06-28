@@ -49,6 +49,7 @@ class ExternalVideoPlayer extends Component {
       errorPlaying: false,
       playbackRate: 1,
       volume: 1,
+      urlPlayed: "",
     };
 
     this.opts = {
@@ -97,6 +98,7 @@ class ExternalVideoPlayer extends Component {
     this.orchestrator = this.orchestrator.bind(this);
     this.autoPlayBlockDetected = this.autoPlayBlockDetected.bind(this);
 
+    this.whichVideo = this.whichVideo.bind(this);
     //this.dispatchTimeUpdate = this.dispatchTimeUpdate.bind(this);
   }
 
@@ -222,8 +224,13 @@ class ExternalVideoPlayer extends Component {
     clearInterval(this.timer);
   }
 
+  whichVideo = (videos, time) => {
+    const found = videos.find(video => video.time[0] <= time && video.time[1] >= time);
+    return found ? found.url : "";
+  }
+
   orchestrator () {
-    const { events, active/*, primaryPlaybackRate, primaryPlaybackVolume, primaryPlaybackMuted*/ } = this.props;
+    const { events, active/*, primaryPlaybackRate, primaryPlaybackVolume, primaryPlaybackMuted*/, videos } = this.props;
     const { playing, playbackRate } = this.state;
 
     this.time = player.primary.currentTime();
@@ -243,10 +250,14 @@ class ExternalVideoPlayer extends Component {
        this.autoPlayTimeout = setTimeout(this.autoPlayBlockDetected, AUTO_PLAY_BLOCK_DETECTION_TIMEOUT_SECONDS * 1000);
     }
 
+    if (active) {
+      const currentVideo = this.whichVideo(videos, this.time);
+      this.setState({ urlPlayed: currentVideo });
+    }
+
     const index = getCurrentDataIndex(events, this.time);
 
-    logger.debug(`external_video: player time=${this.time} active=${active} Playing=${playing} primaryPlayerPlaying=${primaryPlayerPlaying} PlaybackRate=${playbackRate}`);
-
+    logger.debug(`external_video: player url=${currentVideo} time=${this.time} active=${active} Playing=${playing} primaryPlayerPlaying=${primaryPlayerPlaying} PlaybackRate=${playbackRate}`);
 
     if (!primaryPlayerPlaying || !active) {
       this.handleOnPause();
@@ -287,8 +298,8 @@ class ExternalVideoPlayer extends Component {
 
   render() {
 
-    const { videoUrl, active, intl } = this.props;
-    const { playing, playbackRate, muted, autoPlayBlocked, volume } = this.state;
+    const { /*videoUrl,*/ active, intl } = this.props;
+    const { playing, playbackRate, muted, autoPlayBlocked, volume, urlPlayed } = this.state;
 
     return (
 
@@ -306,7 +317,7 @@ class ExternalVideoPlayer extends Component {
         }
 
         <ReactPlayer
-          url={videoUrl}
+          url={urlPlayed}
           config={this.opts}
           volume={volume}
           muted={muted}
