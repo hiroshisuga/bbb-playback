@@ -103,7 +103,8 @@ export default class Synchronizer {
     // (not by passing props but by getting the values from primary player directly (dirty..)
     //this.primary.on('volumechange', () => this.syncVolume());
 
-    this.primary.on('timeupdate', () => this.handleUpdateTime());
+    // Actually this does not work at all..
+    //this.primary.on('timeupdate', () => this.handleUpdateTime());
 
     this.primary.on('waiting', () => {
       if (!this.synching && this.status.secondary === 'canplay') {
