@@ -226,7 +226,8 @@ class ExternalVideoPlayer extends Component {
 
   whichVideo = (videos, time) => {
     const found = videos.find(video => video.time[0] <= time && video.time[1] >= time);
-    return found ? found.url : "";
+    //return found ? found.url : "";
+    return found ? found : {url: "", time:[0, 0]};
   }
 
   orchestrator () {
@@ -254,7 +255,11 @@ class ExternalVideoPlayer extends Component {
 
     if (active) {
       const currentVideo = this.whichVideo(videos, this.time);
-      this.setState({ urlPlayed: currentVideo });
+      if (currentVideo.url !== this.state.urlPlayed) {
+        this.setState({ urlPlayed: currentVideo.url });
+      }
+      // This skrews up the playback (playing back and forth..), but should work in theory
+      //this.seekTo(this.time - currentVideo.time[0]);
     }
 
     logger.debug(`external_video: player url=${currentVideo} time=${this.time} active=${active} Playing=${playing} primaryPlayerPlaying=${primaryPlayerPlaying} PlaybackRate=${playbackRate}`);
@@ -298,12 +303,12 @@ class ExternalVideoPlayer extends Component {
 
   render() {
 
-    const { /*videoUrl,*/ active, intl } = this.props;
+    const { /*videoUrl,*/ active, intl, video } = this.props;
     const { playing, playbackRate, muted, autoPlayBlocked, volume, urlPlayed } = this.state;
 
     if (urlPlayed == "") {
       const currentVideo = this.whichVideo(videos, this.time);
-      this.setState({ urlPlayed: currentVideo });
+      this.setState({ urlPlayed: currentVideo.url });
     }
 
     return (
