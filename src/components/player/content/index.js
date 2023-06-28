@@ -57,8 +57,14 @@ const Content = ({
       return
     }
 
-    const url = video.url
     const events = video.events;
+    
+    const videos = external_videos.map(video => {
+      return {
+        url: video.url,
+        time: [video.timestamp, video.clear],
+      }
+    });
 
     //let primaryPlaybackRate = 1;
     //let primaryPlaybackVolume = 1;
@@ -82,7 +88,7 @@ const Content = ({
       <ExternalVideoPlayer
          active={currentContent === ID.EXTERNAL_VIDEOS}
          intl={intl}
-         videoUrl={url}
+         videos={videos}
          //onPlayerReady={this.handlePlayerReady}
          events={events}
          //primaryPlaybackRate={primaryPlaybackRate}
