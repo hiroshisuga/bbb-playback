@@ -36,7 +36,7 @@ const EVENTS = [
 ];
 
 export default class Synchronizer {
-  constructor(primary, secondary, externalVideos = null) {
+  constructor(primary, secondary/*, externalVideos = null*/) {
     this.primary = primary;
     this.secondary = secondary;
 
