@@ -9,6 +9,7 @@ import player from 'utils/player';
 
 import './styles.css';
 
+import { useIntl } from 'react-intl';
 
 const intlMessages = defineMessages({
   autoPlayWarning: {
