@@ -36,61 +36,16 @@ const Content = ({
                              storage.cursor.tldraw;
 
   const RenderExternalVideo = () => {
-    const time = player.primary ? player.primary.currentTime() : 0;
     const intl = useIntl();
     const { external_videos } = storage;
-    const currentContent = useCurrentContent();
-    
-    if (!external_videos) {
-      return;
-    }
 
-    let currentDataIndex = getCurrentDataIndex(external_videos, time);
-
-    if (currentDataIndex === -1) {
-      currentDataIndex = 0;
-    }
-
-    const video = external_videos[currentDataIndex];
-
-    if (!video) {
-      return
-    }
-
-    const events = video.events;
-    
-    const videos = external_videos.map(video => {
-      return {
-        url: video.url,
-        time: [video.timestamp, video.clear],
-      }
-    });
-
-    //let primaryPlaybackRate = 1;
-    //let primaryPlaybackVolume = 1;
-    //let primaryPlaybackMuted = false;
-/*
-    if (player.webcams)  {
-       primaryPlaybackRate = player.webcams.playbackRate();
-    }
-*/
-    // Use primary player for timing, instead of webcam player (no difference?)
-    //  -> in the end this way to pass props did not work,
-    //      because player/content would be rendered only once in the beginning.
-/*
-    if (player.primary)  {
-       primaryPlaybackRate = player.primary.playbackRate();
-       primaryPlaybackVolume = player.primary.volume();
-       primaryPlaybackMuted = player.primary.muted();
-    }
-*/
     return (
       <ExternalVideoPlayer
-         active={currentContent === ID.EXTERNAL_VIDEOS}
+         //active={currentContent === ID.EXTERNAL_VIDEOS}
          intl={intl}
-         videos={videos}
+         videos={external_videos}
          //onPlayerReady={this.handlePlayerReady}
-         events={events}
+         //events={events}
          //primaryPlaybackRate={primaryPlaybackRate}
          //primaryPlaybackVolume={primaryPlaybackVolume}
          //primaryPlaybackMuted={primaryPlaybackMuted
