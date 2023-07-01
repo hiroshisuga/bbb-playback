@@ -251,7 +251,7 @@ class ExternalVideoPlayer extends Component {
     this.lastTime = this.time;
     this.primaryPlayerPlaying = primaryPlayerPlaying;
 
-    if (/*active &&*/ !this.hasPlayedBefore && !this.autoPlayTimeout) {
+    if (/*active &&*/playing && !this.hasPlayedBefore && !this.autoPlayTimeout) {
        this.autoPlayTimeout = setTimeout(this.autoPlayBlockDetected, AUTO_PLAY_BLOCK_DETECTION_TIMEOUT_SECONDS * 1000);
     }
 
