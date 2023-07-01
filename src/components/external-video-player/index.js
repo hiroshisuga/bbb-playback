@@ -256,7 +256,7 @@ class ExternalVideoPlayer extends Component {
     }
 
     const currentVideo = this.whichVideo(videos, this.time);
-    const index = getCurrentDataIndex(events, this.time);
+    const index = getCurrentDataIndex(currentVideo.events, this.time);
 
     //if (active) {
       if (currentVideo.url !== this.state.urlPlayed) {
