@@ -260,10 +260,15 @@ class ExternalVideoPlayer extends Component {
     const index = getCurrentDataIndex(events, this.time);
 
     //if (active) {
-      const currentVideo = this.whichVideo(videos, this.time);
       if (currentVideo.url !== this.state.urlPlayed) {
         this.setState({ urlPlayed: currentVideo.url });
         logger.debug(`external_video URLchange ${currentVideo.url} -> ${this.state.urlPlayed}`);
+      }
+      // Check time consistency every ORCHESTRATOR_INTERVAL_MILLISECOND msec, and fix when drifted away too much
+      if (index && currentVideo.events && currentVideo.events[index] && playing && (currentVideo.events[index].type == "playerUpdate" || currentVideo.events[index].type == "play") ){
+        const thisPlayerTimeToBe = parseFloat(currentVideo.events[index].time) + (this.time - currentVideo.events[index].timestamp);
+        logger.debug(`Player time to be=${thisPlayerTimeToBe.toFixed(2)} actual player time=${this.player.getCurrentTime().toFixed(2)} inconsistency=${(thisPlayerTimeToBe - this.player.getCurrentTime()).toFixed(2)} Type=${currentVideo.events[index].type}`);
+        this.seekTo(thisPlayerTimeToBe);
       }
     //}
 
