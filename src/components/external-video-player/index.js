@@ -215,7 +215,7 @@ class ExternalVideoPlayer extends Component {
     }
 
     // Seek if viewer has drifted too far away from presenter
-    if (Math.abs(this.getCurrentTime() - time) > SYNC_INTERVAL_SECOND * 0.75) {
+    if (Math.abs(this.getCurrentTime() - time) > SYNC_INTERVAL_SECOND) {
       logger.debug(`Video synchronised! ${(time - this.getCurrentTime()).toFixed(2)} `);
       player.seekTo(time, true);
     }
