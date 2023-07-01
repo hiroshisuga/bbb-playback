@@ -87,7 +87,7 @@ export default class Synchronizer {
       }
     });
 
-    jjjjthis.secondary.on('waiting', () => {
+    this.secondary.on('waiting', () => {
       if (!this.synching && this.status.primary === 'canplay') {
         this.synching = true;
         this.primary.pause();
