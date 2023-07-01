@@ -316,9 +316,8 @@ class ExternalVideoPlayer extends Component {
     const { /*videoUrl, active,*/ intl/*, video*/ } = this.props;
     const { playing, playbackRate, muted, autoPlayBlocked, volume, urlPlayed } = this.state;
 
-    logger.debug(`Rendered ${urlPlayed}. Note this shouldn't be shown frequently!`);
+    logger.debug(`Rendering ${urlPlayed}. Note this shouldn't be shown frequently!`);
     return (
-
       <div 
           className={cx('externalVideos-wrapper', { inactive: false })}
           ref={(ref) => { this.playerParent = ref; }}
