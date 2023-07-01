@@ -12,16 +12,6 @@ import layout from 'utils/layout';
 import storage from 'utils/data/storage';
 import './index.scss';
 
-import {
-  //getCurrentContent,
-  getCurrentDataIndex,
-  //getCurrentDataInterval,
-} from 'utils/data';
-import { useIntl } from 'react-intl';
-import player from 'utils/player';
-import { useCurrentContent } from 'components/utils/hooks';
-import { ID } from 'utils/constants';
-
 const Content = ({
   fullscreen,
   handleSearch,
