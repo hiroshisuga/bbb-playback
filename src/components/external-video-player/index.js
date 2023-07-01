@@ -19,7 +19,7 @@ const intlMessages = defineMessages({
 });
 
 
-const SYNC_INTERVAL_SECOND = 5;
+const SYNC_INTERVAL_SECOND = 1;
 const AUTO_PLAY_BLOCK_DETECTION_TIMEOUT_SECONDS = 5;
 const ORCHESTRATOR_INTERVAL_MILLISECOND = 500;
 
@@ -128,7 +128,7 @@ class ExternalVideoPlayer extends Component {
 
   getCurrentTime() {
     if (this.player && this.player.getCurrentTime) {
-      return Math.round(this.player.getCurrentTime());
+      return this.player.getCurrentTime();
     }
   }
 
@@ -143,12 +143,11 @@ class ExternalVideoPlayer extends Component {
 
     const currentRate = this.state.playbackRate;
 
-    logger.debug(`external_video: setPlaybackRate current=${currentRate} primary=${value} lastEventPlaybackRate=${this.lastEventPlaybackRate} rate=${rate}`);
-
     if (currentRate === rate) {
       return;
     }
 
+    logger.debug(`external_video: setPlaybackRate current=${currentRate} primary=${value} lastEventPlaybackRate=${this.lastEventPlaybackRate} rate=${rate}`);
     this.setState({ playbackRate: rate });
 
   }
@@ -197,8 +196,14 @@ class ExternalVideoPlayer extends Component {
   }
 
   handleVolumeChange = (value, isMuted) => {
-    this.setState({ volume: parseFloat(value)});
-    this.setState({ muted: isMuted});
+    if (this.state.volume !== value ) {
+      this.setState({ volume: parseFloat(value)});
+      logger.debug(`external_video: VolumeChange CV=${this.state.volume.toFixed(2)} NV=${value.toFixed(2)}`);
+    }
+    if (this.state.muted != isMuted) {
+      this.setState({ muted: isMuted});
+      logger.debug(`external_video: muteChange  CM=${this.state.muted} NM=${isMuted}`);
+    }
   }
 
 
@@ -212,6 +217,7 @@ class ExternalVideoPlayer extends Component {
 
     // Seek if viewer has drifted too far away from presenter
     if (Math.abs(this.getCurrentTime() - time) > SYNC_INTERVAL_SECOND * 0.75) {
+      logger.debug(`Video synchronised! ${(time - this.getCurrentTime()).toFixed(2)} `);
       player.seekTo(time, true);
     }
   }
@@ -225,13 +231,12 @@ class ExternalVideoPlayer extends Component {
   }
 
   whichVideo = (videos, time) => {
-    const found = videos.find(video => video.time[0] <= time && video.time[1] >= time);
-    //return found ? found.url : "";
-    return found ? found : {url: "", time:[0, 0]};
+    const found = videos.find(video => video.timestamp <= time && video.clear >= time);
+    return found ? found : {url: "", timestamp: 0, clear: 0};
   }
 
   orchestrator () {
-    const { events, active/*, primaryPlaybackRate, primaryPlaybackVolume, primaryPlaybackMuted*/, videos } = this.props;
+    const { /*events, active, primaryPlaybackRate, primaryPlaybackVolume, primaryPlaybackMuted*/, videos } = this.props;
     const { playing, playbackRate } = this.state;
 
     this.time = player.primary.currentTime();
@@ -247,32 +252,32 @@ class ExternalVideoPlayer extends Component {
     this.lastTime = this.time;
     this.primaryPlayerPlaying = primaryPlayerPlaying;
 
-    if (active && !this.hasPlayedBefore && !this.autoPlayTimeout) {
+    if (/*active &&*/ !this.hasPlayedBefore && !this.autoPlayTimeout) {
        this.autoPlayTimeout = setTimeout(this.autoPlayBlockDetected, AUTO_PLAY_BLOCK_DETECTION_TIMEOUT_SECONDS * 1000);
     }
 
+    const currentVideo = this.whichVideo(videos, this.time);
     const index = getCurrentDataIndex(events, this.time);
 
-    if (active) {
+    //if (active) {
       const currentVideo = this.whichVideo(videos, this.time);
       if (currentVideo.url !== this.state.urlPlayed) {
         this.setState({ urlPlayed: currentVideo.url });
+        logger.debug(`external_video URLchange ${currentVideo.url} -> ${this.state.urlPlayed}`);
       }
-      // This skrews up the playback (playing back and forth..), but should work in theory
-      //this.seekTo(this.time - currentVideo.time[0]);
-    }
+    //}
 
-    logger.debug(`external_video: player url=${currentVideo} time=${this.time} active=${active} Playing=${playing} primaryPlayerPlaying=${primaryPlayerPlaying} PlaybackRate=${playbackRate}`);
+    logger.debug(`external_video: player url=${this.state.urlPlayed} time=${this.time.toFixed(2)} Playing=${playing} primaryPlayerPlaying=${primaryPlayerPlaying} PlaybackRate=${playbackRate}, events=${currentVideo.events}`);
 
-    if (!primaryPlayerPlaying || !active) {
+    if (!primaryPlayerPlaying /*|| !active*/) {
       this.handleOnPause();
       this.playerUpdateTime = -1;
       return
     }
 
-    if (index && events && events[index] && events[index].type)
+    if (index && currentVideo.events && currentVideo.events[index] && currentVideo.events[index].type)
     {
-        const {type, time, rate, playing}  = events[index];
+        const {type, time, rate, playing}  = currentVideo.events[index];
 
         logger.debug(`External Video Event: type=${type} time=${time} rate=${rate} playing=${playing}`);
 
@@ -303,18 +308,14 @@ class ExternalVideoPlayer extends Component {
 
   render() {
 
-    const { /*videoUrl,*/ active, intl, video } = this.props;
+    const { /*videoUrl, active,*/ intl/*, video*/ } = this.props;
     const { playing, playbackRate, muted, autoPlayBlocked, volume, urlPlayed } = this.state;
 
-    if (urlPlayed == "") {
-      const currentVideo = this.whichVideo(videos, this.time);
-      this.setState({ urlPlayed: currentVideo.url });
-    }
-
+    logger.debug(`Rendered ${urlPlayed}. Note this shouldn't be shown frequently!`);
     return (
 
       <div 
-          className={cx('externalVideos-wrapper', { inactive: !active })}
+          className={cx('externalVideos-wrapper', { inactive: false })}
           ref={(ref) => { this.playerParent = ref; }}
       >
         {autoPlayBlocked
@@ -338,7 +339,7 @@ class ExternalVideoPlayer extends Component {
           onPause={this.handleOnPause}
           onBuffer={this.handleOnBuffer}
           onBufferEnd={this.handleOnBufferEnd}
-          ref={(ref) => { this.player = ref; if (!player.external_videos) {player.external_videos = this.player; } }}
+          ref={(ref) => { this.player = ref; }}
           width="100%"
           height="100%"
         />
