@@ -40,9 +40,9 @@ export default class Synchronizer {
     this.primary = primary;
     this.secondary = secondary;
 
-    if (externalVideos) {
-      this.externalVideos = externalVideos;  
-    }
+    //if (externalVideos) {
+    //  this.externalVideos = externalVideos;  
+    //}
 
     this.status = {
       primary: 'waiting',
@@ -107,17 +107,13 @@ export default class Synchronizer {
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
         const currentTime = this.primary.currentTime();
-        if (this.secondary) {
-          this.secondary.currentTime(currentTime);
-        }
+        this.secondary.currentTime(currentTime);
       }
     });
 
     EVENTS.forEach(event => {
       this.primary.on(event, () => logger.debug(`primary ${event} ${this.status.primary}`));
-      if (this.secondary) {
-        this.secondary.on(event, () => logger.debug(`secondary ${event} ${this.status.secondary}`));
-      }
+      this.secondary.on(event, () => logger.debug(`secondary ${event} ${this.status.secondary}`));
     });
   }
 }
