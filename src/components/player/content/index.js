@@ -12,6 +12,8 @@ import layout from 'utils/layout';
 import storage from 'utils/data/storage';
 import './index.scss';
 
+import { useIntl } from 'react-intl';
+
 const Content = ({
   fullscreen,
   handleSearch,
