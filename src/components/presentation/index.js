@@ -86,7 +86,13 @@ const Presentation = () => {
           <g clipPath="url(#viewBox)">
             <Slide />
             <Canvas />
-            <Cursor viewBox={viewBox} />
+            { storage.cursors ?
+                Object.keys(storage.cursors).map((userId) => {
+                  return (<Cursor viewBox={viewBox} userId={userId}/> );
+                })
+              :
+                <Cursor viewBox={viewBox} />
+            }
           </g>
         </svg>
       </div>
