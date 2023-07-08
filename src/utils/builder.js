@@ -441,7 +441,7 @@ const buildCursors = result => {
         data[userId].sort((a, b) => a.timestamp - b.timestamp);
         while (data[userId].slice(-1)[0].x == -1 && data[userId].slice(-1)[0].y == -1) {
           const lastSlide = data[userId].pop();
-          if (data[userId].slice(-1)[0].x !== -1 || data[userId].slice(-1)[0].y !== -1) {
+          if (data[userId].length == 0 || (data[userId].slice(-1)[0].x !== -1 || data[userId].slice(-1)[0].y !== -1)) {
             data[userId].push(lastSlide);
             break;
          }
