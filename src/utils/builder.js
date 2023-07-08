@@ -10,6 +10,7 @@ import {
   ROLES,
   SHAPES,
 } from './constants';
+import storage from 'utils/data/storage';
 import logger from './logger';
 
 const convertToArray = (object) => {
@@ -413,6 +414,72 @@ const buildCursor = result => {
   return data;
 };
 
+const buildCursors = result => {
+  let data = {};
+  const { recording } = result;
+
+  if (hasProperty(recording, 'user')) {
+    convertToArray(recording.user).forEach(user => {
+      const userId = user._userId;
+      if (hasProperty(user, 'event')) {
+        data[userId] = convertToArray(user.event).map(cursor => {
+          const position = getNumbers(cursor.cursor);
+
+          return {
+            timestamp: parseFloat(cursor._timestamp),
+            x: position.shift(),
+            y: position.shift(),
+          };
+        });
+
+        // viewers' cursors should be cleared when the slide changes
+        storage.slides.forEach(slide => {
+          if (data[userId].slice(0)[0].timestamp < slide.timestamp) {
+            data[userId].push({ x: -1, y: -1, timestamp: slide.timestamp });
+          }
+        });
+        data[userId].sort((a, b) => a.timestamp - b.timestamp);
+        while (data[userId].slice(-1)[0].x == -1 && data[userId].slice(-1)[0].y == -1) {
+          const lastSlide = data[userId].pop();
+          if (data[userId].slice(-1)[0].x !== -1 || data[userId].slice(-1)[0].y !== -1) {
+            data[userId].push(lastSlide);
+            break;
+         }
+       }
+      }
+    });
+  }
+  return data;
+};
+
+const buildPresenters = result => {
+  let data;
+  const { recording } = result;
+  if (hasProperty(recording, 'event')) {
+    data = convertToArray(recording.event).map(event => {
+      return {
+        timestamp: parseFloat(event._timestamp),
+        userId: event.userId,
+      }
+    });
+  }
+  return data;
+}
+
+const buildParticipants = result => {
+  const data = {};
+  const { recording } = result;
+  if (hasProperty(recording, 'participant')) {
+    convertToArray(recording.participant).forEach(participant => {
+      data[participant._userId] = {
+        name: participant.name,
+        // further info could be added
+      } ;
+    });
+  }
+  return data;
+}
+
 const clearHyperlink = message => {
   const regex = /<a href="(.*)" rel="nofollow"><u>\1<\/u><\/a>/g;
 
@@ -541,11 +608,20 @@ const build = (filename, value) => {
           case config.chat:
             data = buildChat(result);
             break;
+          case config.metadata:
+            data = buildMetadata(result);
+            break;
           case config.cursor:
             data = buildCursor(result);
             break;
-          case config.metadata:
-            data = buildMetadata(result);
+          case config.cursors:
+            data = buildCursors(result);
+            break;
+          case config.participants:
+            data = buildParticipants(result);
+            break;
+          case config.presenters:
+            data = buildPresenters(result);
             break;
           case config.panzooms:
             data = buildPanzooms(result);
