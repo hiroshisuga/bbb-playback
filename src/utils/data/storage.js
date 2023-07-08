@@ -196,6 +196,9 @@ const storage = {
   get cursor() {
     return DATA[ID.CURSOR];
   },
+  get cursors() {
+    return DATA[ID.CURSORS];
+  },
   get media() {
     return DATA[ID.MEDIA];
   },
@@ -218,6 +221,12 @@ const storage = {
   },
   get panzooms() {
     return DATA[ID.PANZOOMS];
+  },
+  get presenters() {
+    return DATA[ID.PRESENTERS];
+  },
+  get participants() {
+    return DATA[ID.PARTICIPANTS];
   },
   get screenshare() {
     return DATA[ID.SCREENSHARE];
