@@ -41,6 +41,7 @@ const ID = {
   POLLS: 'polls',
   PRESENTATION: 'presentation',
   SCREENSHARE: 'screenshare',
+  EXTERNAL_VIDEOS: 'externalVideos',
   SEARCH: 'search',
   SETTINGS: 'settings',
   SHAPES: 'shapes',
@@ -61,6 +62,7 @@ const CONTENT = [
   ID.VIDEOS,
   ID.NOTES,
   ID.SCREENSHARE,
+  ID.EXTERNAL_VIDEOS,
   ID.CAPTIONS,
 ];
 

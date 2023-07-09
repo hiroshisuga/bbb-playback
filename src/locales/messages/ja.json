@@ -38,5 +38,7 @@
   "player.search.modal.title": "検索",
   "player.search.modal.subtitle": "プレゼンスライドの内容を探す",
   "player.thumbnails.wrapper.aria": "サムネイルエリア",
-  "player.webcams.wrapper.aria": "ウェブカムエリア"
+  "player.webcams.wrapper.aria": "ウェブカムエリア",
+  "player.video.wrapper.aria": "ビデオエリア",
+  "player.externalVideo.autoPlayWarning": "音声の再生には許可が必要です"
 }
