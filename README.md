@@ -1,5 +1,7 @@
 # bbb-playback
 
+Marker Eraser, Pretty Poll, ExtVideo3, and Multiuser Cursors.
+
 Clone this repository, install the dependencies and deploy
 ```
 git clone https://github.com/bigbluebutton/bbb-playback.git
