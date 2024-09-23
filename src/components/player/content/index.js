@@ -2,6 +2,9 @@ import React from 'react';
 import cx from 'classnames';
 import Presentation from 'components/presentation';
 import TldrawPresentation from 'components/tldraw';
+import TldrawPresentationV2 from 'components/tldraw_v2';
+import { getTldrawBbbVersion } from 'utils/tldraw';
+import { useCurrentInterval } from 'components/utils/hooks';
 import Screenshare from 'components/screenshare';
 import ExternalVideoPlayer from 'components/external-video-player';
 import Thumbnails from 'components/thumbnails';
@@ -11,19 +14,8 @@ import { isEqual } from 'utils/data/validators';
 import layout from 'utils/layout';
 import storage from 'utils/data/storage';
 import './index.scss';
-/*
-import {
-  //getCurrentContent,
-  getCurrentDataIndex,
-  //getCurrentDataInterval,
-} from 'utils/data';
-*/
 import { useIntl } from 'react-intl';
-/*
-import player from 'utils/player';
-import { useCurrentContent } from 'components/utils/hooks';
-import { ID } from 'utils/constants';
-*/
+import { gte as semverGte } from 'semver';
 
 const Content = ({
   fullscreen,
@@ -32,6 +24,10 @@ const Content = ({
   swap,
   toggleFullscreen,
 }) => {
+  const {
+    index,
+  } = useCurrentInterval(storage.tldraw);
+
   if (layout.single) return null;
 
   const isTldrawWhiteboard = storage.tldraw.length ||
@@ -57,6 +53,22 @@ const Content = ({
     );
   }
 
+  let presentation;
+  
+  if (isTldrawWhiteboard) {
+    const bbbVersion = getTldrawBbbVersion(index);
+
+    if (bbbVersion && semverGte(bbbVersion, '3.0.0')) {
+      presentation = <TldrawPresentationV2 />;
+    }
+    else {
+      presentation = <TldrawPresentation />;
+    }
+  }
+  else {
+    presentation = <Presentation />;
+  }
+
   return (
     <div className={cx('content', { 'swapped-content': swap })}>
       <FullscreenButton
@@ -66,7 +78,7 @@ const Content = ({
         toggleFullscreen={toggleFullscreen}
       />
       <div className="top-content">
-        {isTldrawWhiteboard ? <TldrawPresentation /> : <Presentation />}
+        {presentation}
         {layout.screenshare ? <Screenshare /> : null}
         {layout.external_videos ? RenderExternalVideo() : null}
       </div>
