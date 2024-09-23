@@ -4,6 +4,7 @@ $cursor-size: .5rem;
 
 :root {
   --cursor-fill-color: var(--red);
+  --cursor-nonpresenters-fill-color: var(--green);
 }
 
 .presentation-wrapper {
@@ -25,6 +26,19 @@ $cursor-size: .5rem;
   .cursor {
     fill: var(--cursor-fill-color);
     r: $cursor-size;
+  }
+
+  .cursor-nonpresenters {
+    fill: var(--cursor-nonpresenters-fill-color);
+    r: $cursor-size;
+    fill-opacity: 0.6;
+  }
+  
+  .cursor-label {
+    font-weight: 600;
+    //font-size: 12;
+    fill: var(--cursor-nonpresenters-fill-color);
+    fill-opacity: 0.8;
   }
 }
 

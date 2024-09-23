@@ -23,8 +23,11 @@ const files = {
   notes: 'notes.html',
   panzooms: 'panzooms.xml',
   polls: 'polls.json',
+  presenters: 'presenters.xml',
+  participants: 'participants.xml',
   screenshare: 'deskshare.xml',
   shapes: 'shapes.svg',
+  cursors: 'cursors.xml',
   tldraw: 'tldraw.json',
   videos: 'external_videos.json',
 };
