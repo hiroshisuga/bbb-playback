@@ -265,9 +265,12 @@ class ExternalVideoPlayer extends Component {
       }
       // Check time consistency every ORCHESTRATOR_INTERVAL_MILLISECOND msec, and fix when drifted away too much
       if (index && currentVideo.events && currentVideo.events[index] && playing && (currentVideo.events[index].type == "playerUpdate" || currentVideo.events[index].type == "play") ){
-        const thisPlayerTimeToBe = parseFloat(currentVideo.events[index].time) + (this.time - currentVideo.events[index].timestamp)*currentVideo.events[index].rate;
-        logger.debug(`Player time to be=${thisPlayerTimeToBe.toFixed(2)} actual player time=${this.player.getCurrentTime().toFixed(2)} inconsistency=${(thisPlayerTimeToBe - this.player.getCurrentTime()).toFixed(2)} Type=${currentVideo.events[index].type}`);
-        this.seekTo(thisPlayerTimeToBe);
+        // thisMovieTimeToBe =            MovieTimeToBe +               (currentPlayerTime - eventTimeStamp) * playRate
+        // [movie time after calibration] [from the start of the movie] [how much sec from the timestamp of a update event]
+        const thisMovieTimeToBe = parseFloat(currentVideo.events[index].time) + (this.time - currentVideo.events[index].timestamp) * currentVideo.events[index].rate;
+        logger.debug(`eventTimeStamp=${currentVideo.events[index].timestamp.toFixed(2)} MovieTimeToBe=${parseFloat(currentVideo.events[index].time).toFixed(2)} currentPlayerTime=${this.time.toFixed(2)} currentMovieTime=${this.player.getCurrentTime().toFixed(2)} rate=${currentVideo.events[index].rate}`);
+        logger.debug(`Calibrated movie time to be=${thisMovieTimeToBe.toFixed(2)} actual movie time=${this.player.getCurrentTime().toFixed(2)} inconsistency=${(thisMovieTimeToBe - this.player.getCurrentTime()).toFixed(2)} Type=${currentVideo.events[index].type}`);
+        this.seekTo(thisMovieTimeToBe);
       }
     //}
 
