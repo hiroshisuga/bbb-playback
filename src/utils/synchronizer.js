@@ -36,9 +36,13 @@ const EVENTS = [
 ];
 
 export default class Synchronizer {
-  constructor(primary, secondary) {
+  constructor(primary, secondary/*, externalVideos = null*/) {
     this.primary = primary;
     this.secondary = secondary;
+
+    //if (externalVideos) {
+    //  this.externalVideos = externalVideos;  
+    //}
 
     this.status = {
       primary: 'waiting',
