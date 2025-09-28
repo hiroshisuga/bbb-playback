@@ -342,7 +342,7 @@ const buildShapes = result => {
     data.thumbnails = buildThumbnails(data.slides);
     data.canvases = buildCanvases(g, data.slides);
   }
-
+  data.slides = data.slides.filter(slide => !slide.src.includes(ID.DESKSHARE));
   return data;
 };
 
@@ -376,6 +376,22 @@ const buildTldraw = result => {
 
   return tldraw;
 }
+
+const buildLayout = result => {
+  const { recording } = result;
+
+  if (recording?.event) {
+    const newData = convertToArray(recording.event).map(layout => {
+      return {
+        timestamp: parseFloat(layout._timestamp),
+        showScreenshare: layout._show_screenshare === 'true',
+      }
+    });
+    return newData;
+  }
+
+  return [];
+};
 
 const buildPanzooms = result => {
   let data = [];
@@ -460,14 +476,25 @@ const buildChat = result => {
       const emphasized = chat._chatEmphasizedText === 'true';
       const moderator = chat._senderRole === ROLES.MODERATOR;
 
+      // Normalize reactions to always be an array
+      const reactionsList = chat.reactions ? convertToArray(chat.reactions.reaction) : [];
+      const reactions = reactionsList.map((messageReaction) => ({
+          emoji: messageReaction._emoji,
+          count: messageReaction._count,
+        }),
+      );
       return {
         clear,
+        id: chat._id,
         emphasized,
         hyperlink: message !== chat._message,
         initials,
         name: chat._name,
         message,
         moderator,
+        reactions,
+        replyToMessageId: chat._replyToMessageId,
+        lastEditedTimestamp: chat._lastEditedTimestamp,
         timestamp: parseFloat(chat._in),
       };
     });
@@ -593,6 +620,9 @@ const build = (filename, value) => {
             break;
           case config.shapes:
             data = buildShapes(result);
+            break;
+          case config.layout:
+            data = buildLayout(result);
             break;
           default:
             logger.debug('unhandled', 'xml', filename);

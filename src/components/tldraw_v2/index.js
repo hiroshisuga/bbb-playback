@@ -11,12 +11,15 @@ import {
   useCurrentContent,
   useCurrentIndex,
   useCurrentInterval,
+  useShouldShowScreenShare,
 } from 'components/utils/hooks';
 import { ID } from 'utils/constants';
 import storage from 'utils/data/storage';
 import './index.scss';
-import { getTldrawData, getViewBox, createTldrawImageAsset,
-         createTldrawBackgroundShape, createTldrawCursorShape } from 'utils/tldraw';
+import {
+  getTldrawData, getViewBox, createTldrawImageAsset,
+  createTldrawBackgroundShape, createTldrawCursorShape
+} from 'utils/tldraw';
 import { buildFileURL } from 'utils/data';
 import { isEmpty } from 'utils/data/validators';
 import getCursor from './cursor';
@@ -51,21 +54,14 @@ const SlideData = (tldrawAPI) => {
     width,
   } = storage.slides[currentIndex];
 
-  let imageUrl = buildFileURL(src);
-
-  // Tldraw neeed the full address as the source
-  if (!imageUrl.startsWith("http")) {
-    imageUrl = window.location.origin + imageUrl;
-  }
-
   const scaleRatio = Math.min(MAX_IMAGE_WIDTH / width, MAX_IMAGE_HEIGHT / height);
   const scaledWidth = width * scaleRatio;
   const scaledHeight = height * scaleRatio;
 
   const curPageId = tldrawAPI?.getCurrentPageId();
   const assetId = AssetRecordType.createId(curPageId);
-  
-  assets[`slide-background-asset-${id}`] = createTldrawImageAsset(assetId, imageUrl, scaledWidth, scaledHeight)
+
+  assets[`slide-background-asset-${id}`] = createTldrawImageAsset(assetId, buildFileURL(src), scaledWidth, scaledHeight)
   shapes["slide-background-shape"] = createTldrawBackgroundShape(assetId, curPageId, scaledWidth, scaledHeight)
 
   if (index === -1 || isEmpty(interval)) return { assets, shapes, scaleRatio }
@@ -104,6 +100,7 @@ const TldrawPresentationV2 = ({ size }) => {
   const started = currentPanzoomIndex !== -1;
 
   const result = SlideData(tldrawAPI);
+  const shouldShowScreenshare = useShouldShowScreenShare();
 
   let { assets, shapes, scaleRatio } = result;
   const {
@@ -124,22 +121,26 @@ const TldrawPresentationV2 = ({ size }) => {
   }
 
   React.useEffect(() => {
+    if (size.width <= 0 || size.height <= 0) {
+      return;
+    }
     let zoom =
       Math.min(
         svgWidth / viewboxWidth,
         svgHeight / viewboxHeight
       );
 
-    tldrawAPI?.setCamera({x, y, z: zoom});
+    tldrawAPI?.setCamera({ x, y, z: zoom });
 
   }, [svgWidth, svgHeight, viewboxWidth, viewboxHeight, x, y, currentSlideIndex, tldrawAPI, size, result]);
 
   React.useEffect(() => {
+    tldrawAPI?.updateInstanceState({ isReadonly: false });
     // Remove all current shapes
     const currentShapesSet = tldrawAPI?.getCurrentPageShapeIds() || (new Set());
     const curentShapes = Array.from(currentShapesSet);
     if (curentShapes.length > 0) { tldrawAPI?.deleteShapes(curentShapes); }
-  
+
     // Remove unnecessary properties from shapes to prevent Tldraw's validation from failing
     const validatedShapes = Object.values(shapes).map((shape) => {
       if ('isModerator' in shape) {
@@ -150,12 +151,13 @@ const TldrawPresentationV2 = ({ size }) => {
 
     tldrawAPI?.createAssets(Object.values(assets));
     tldrawAPI?.createShapes(validatedShapes);
+    tldrawAPI?.updateInstanceState({ isReadonly: true });
   }, [tldrawAPI, shapes, assets]);
 
   return (
     <div
       aria-label={intl.formatMessage(intlMessages.aria)}
-      className={cx('presentation-wrapper', { inactive: currentContent !== ID.PRESENTATION })}
+      className={cx('presentation-wrapper', { inactive: (currentContent !== ID.PRESENTATION && shouldShowScreenshare) })}
       id={ID.PRESENTATION}
     >{!started
       ? <div className={cx('presentation', 'logo')} />
@@ -173,12 +175,27 @@ const TldrawPresentationV2 = ({ size }) => {
             app.setSelectedIds = () => { };
             app.setHoveredId = () => { };
             app.setSelectedShapes = () => { };
-            app.setHoveredShapes = () => { };
+            app.setHoveredShape = () => { };
             app.onRightClick = () => { };
             app.onDoubleClick = () => { };
             app.onTripleClick = () => { };
             app.onQuadrupleClick = () => { };
             app.onWheel = () => { };
+            app.store.listen(
+              (entry) => {
+                const { changes } = entry;
+                const { updated } = changes;
+                const { 'instance:instance': instances } = updated;
+
+                if (instances && instances.length > 0) {
+                  const newInstance = instances[1];
+                  if (newInstance && newInstance.brush) {
+                    app.updateInstanceState({ brush: null });
+                  }
+                }
+              },
+              { source: 'user' },
+            );
             setTLDrawAPI(app);
           }}
         />

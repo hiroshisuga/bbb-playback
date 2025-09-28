@@ -28,6 +28,7 @@ const files = {
   tldraw: 'tldraw.json',
   videos: 'external_videos.json',
   externalVideos: 'external_videos.xml',
+  layout: 'layout.xml',
 };
 
 const locale = { default: 'en' };

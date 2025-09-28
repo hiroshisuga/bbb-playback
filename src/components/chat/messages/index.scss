@@ -1,12 +1,35 @@
 @import 'src/styles/sizes';
 
 :root {
-  --message-box-shadow-color: var(--gray-light);
+  --gray-light-color: var(--gray-light);
+  --gray-lightest-color: var(--gray-lightest);
+  --highlight-color: var(--blue);
+}
+
+.reply-tag {
+  background-color: var(--gray-lightest-color);
+  display: flex;
+  width: 90%;
+  padding: $padding-small;
+  margin-bottom: $margin-extra-small;
+  border-radius: .35rem;
+  align-items: center;
+  line-height: 1;
+}
+
+.user-message-wrapper {
+  transition: background-color .5s ease;
+}
+
+.highlight {
+  background-color: var(--highlight-color);
 }
 
 .message {
   box-sizing: border-box;
   display: flex;
+  flex-direction: column;
+
   width: 100%;
 
   [dir="ltr"] & {
@@ -15,6 +38,10 @@
 
   [dir="rtl"] & {
     padding: 0 $padding $padding 0;
+  }
+
+  .main-content-wrapper {
+    display: flex;
   }
 
   .data {
@@ -45,6 +72,20 @@
     [dir="rtl"] & {
       padding: 0 0 0 $padding-extra-small;
     }
+  }
+
+  .edited-tag {
+    color: var(--gray-light-color);
+    font-style: italic;
+    font-size: 75%;
+    display: flex;
+    align-items: center;
+    margin-left: 0.5rem;
+    line-height: 1;
+  }
+  
+  .edited-label {
+    margin-left: 0.25rem;
   }
 
   .name {
@@ -95,7 +136,7 @@
 
     &:focus,
     &:hover {
-      box-shadow: 0 0 0 $margin-extra-small var(--message-box-shadow-color);
+      box-shadow: 0 0 0 $margin-extra-small var(--gray-light-color);
     }
   }
 

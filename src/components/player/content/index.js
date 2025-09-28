@@ -4,7 +4,7 @@ import Presentation from 'components/presentation';
 import TldrawPresentation from 'components/tldraw';
 import TldrawPresentationV2 from 'components/tldraw_v2';
 import { getTldrawBbbVersion } from 'utils/tldraw';
-import { useCurrentInterval } from 'components/utils/hooks';
+import { useCurrentInterval, useShouldShowScreenShare } from 'components/utils/hooks';
 import Screenshare from 'components/screenshare';
 import ExternalVideoPlayer from 'components/external-video-player';
 import Thumbnails from 'components/thumbnails';
@@ -27,6 +27,8 @@ const Content = ({
   const {
     index,
   } = useCurrentInterval(storage.tldraw);
+
+  const shouldShowScreenshare = useShouldShowScreenShare();
 
   if (layout.single) return null;
 
@@ -79,7 +81,19 @@ const Content = ({
       />
       <div className="top-content">
         {presentation}
-        {layout.screenshare ? <Screenshare /> : null}
+        {layout.screenshare ? (
+          // video-js doesn't mount properly when not mounted in time
+          <span style={!shouldShowScreenshare ?{
+            display: 'none',
+            width: '100%',
+            height: '100%'
+          } : {
+            width: '100%',
+            height: '100%',
+          }}>
+            <Screenshare />
+          </span>
+        ): null}
         {layout.external_videos ? RenderExternalVideo() : null}
       </div>
       <div className={cx('bottom-content', { 'inactive': fullscreen })}>

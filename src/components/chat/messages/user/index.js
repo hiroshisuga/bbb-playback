@@ -33,7 +33,11 @@ const User = ({
   name,
   moderator,
   text,
+  edited,
   timestamp,
+  messageToBeReplied,
+  scrollTo,
+  reactions,
 }) => {
 
   return (
@@ -42,14 +46,19 @@ const User = ({
       circle={!moderator}
       emphasized={emphasized}
       initials={initials}
+      edited={edited}
       name={name}
+      reactions={reactions}
       timestamp={timestamp}
+      messageToBeReplied={messageToBeReplied}
+      scrollTo={scrollTo}
     >
       <Text
         active={active}
         hyperlink={hyperlink}
         text={text}
       />
+      
     </Message>
   );
 };

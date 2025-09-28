@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Icon from 'components/utils/icon';
 import { FormattedTime } from 'react-intl';
 import cx from 'classnames';
 import { getTimestampAsMilliseconds } from 'utils/data';
@@ -21,6 +22,7 @@ const Info = ({
   active,
   name,
   timestamp,
+  edited,
 }) => {
   const milliseconds = getTimestampAsMilliseconds(timestamp);
 
@@ -39,6 +41,13 @@ const Info = ({
           value={milliseconds}
         />
       </div>
+      { edited
+        && (
+        <span className='edited-tag'>
+          <Icon name='pen'/>
+          <span className='edited-label'>(Edited)</span>
+        </span>
+      )}
     </div>
   );
 };

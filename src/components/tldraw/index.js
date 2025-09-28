@@ -18,6 +18,7 @@ import {
   useCurrentContent,
   useCurrentIndex,
   useCurrentInterval,
+  useShouldShowScreenShare,
 } from 'components/utils/hooks';
 import { ID } from 'utils/constants';
 import storage from 'utils/data/storage';
@@ -55,12 +56,6 @@ const SlideData = (tldrawAPI) => {
     src,
     width,
   } = storage.slides[currentIndex];
-
-  let imageUrl = buildFileURL(src);
-  // tldraw needs the full address as src
-  if (!imageUrl.startsWith("http")) {
-    imageUrl = window.location.origin + imageUrl;
-  }
 
   const bbbVersion = getTldrawBbbVersion(index);
   if (bbbVersion && semverGte(bbbVersion, '2.6.1')) {
@@ -123,7 +118,7 @@ const TldrawPresentation = ({ size }) => {
   const currentPanzoomIndex = useCurrentIndex(storage.panzooms);
   const currentSlideIndex = useCurrentIndex(storage.slides);
   const started = currentPanzoomIndex !== -1;
-
+  const shouldShowScreenShare = useShouldShowScreenShare();
   const result = SlideData(tldrawAPI);
 
   let { assets, shapes, scaleRatio } = result;
@@ -162,7 +157,7 @@ const TldrawPresentation = ({ size }) => {
   return (
     <div
       aria-label={intl.formatMessage(intlMessages.aria)}
-      className={cx('presentation-wrapper', { inactive: currentContent !== ID.PRESENTATION })}
+      className={cx('presentation-wrapper', { inactive: (currentContent !== ID.PRESENTATION && shouldShowScreenShare) })}
       id={ID.PRESENTATION}
     >
       {!started

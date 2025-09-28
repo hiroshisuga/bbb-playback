@@ -166,6 +166,7 @@ const storage = {
       presentation: hasProperty(DATA, ID.SHAPES),
       screenshare: hasProperty(DATA, ID.SCREENSHARE),
       externalVideos: hasProperty(DATA, ID.EXTERNAL_VIDEOS),
+      layoutSwap: hasProperty(DATA, ID.LAYOUT),
     };
   },
   get content() {
@@ -178,6 +179,7 @@ const storage = {
       presentation: hasPresentation(this.slides),
       screenshare: !isEmpty(this.screenshare),
       externalVideos: !isEmpty(this.external_videos),
+      layoutSwap: !isEmpty(this.layoutSwap),
     };
   },
   get alternates() {
@@ -242,6 +244,9 @@ const storage = {
     }
 
     return DATA[ID.THUMBNAILS];
+  },
+  get layoutSwap() {
+    return DATA[ID.LAYOUT];
   },
   get tldraw() {
     return DATA[ID.TLDRAW];

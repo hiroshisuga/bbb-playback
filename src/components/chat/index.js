@@ -38,6 +38,9 @@ const Chat = () => {
     }
   };
 
+  const scrollTo = (element) => {
+    handleAutoScroll(firstNode.current, element, POSITIONS.TOP, config.align);
+  }
   useEffect(() => {
     if (!interaction.current) {
       if (config.scroll) {
@@ -58,6 +61,7 @@ const Chat = () => {
     >
       <Messages
         currentIndex={currentIndex}
+        scrollTo={scrollTo}
         setRef={(node, index) => setRef(node, index)}
       />
     </div>

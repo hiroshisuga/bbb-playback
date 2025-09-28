@@ -5,6 +5,8 @@ import Info from './info';
 import Margin from './margin';
 import player from 'utils/player';
 import './index.scss';
+import Reply from './reply';
+import ChatMessageReactions from './reactions';
 
 const propTypes = {
   active: PropTypes.bool,
@@ -29,6 +31,7 @@ const defaultProps = {
   initials: '',
   name: '',
   timestamp: 0,
+  reactions: [],
 };
 
 const Message = ({
@@ -38,7 +41,11 @@ const Message = ({
   emphasized,
   icon,
   initials,
+  messageToBeReplied,
+  scrollTo,
+  edited,
   name,
+  reactions,
   timestamp,
 }) => {
   const handleOnClick = () => {
@@ -47,24 +54,41 @@ const Message = ({
 
   return (
     <div className="message">
-      <Margin
-        active={active}
-        circle={circle}
-        icon={icon}
-        initials={initials}
-        name={name}
-        onClick={() => handleOnClick()}
-      />
-      <div className="data">
-        <Info
+      <div
+        className="main-content-wrapper"
+      >
+        <Margin
           active={active}
+          circle={circle}
+          icon={icon}
+          initials={initials}
           name={name}
-          timestamp={timestamp}
+          onClick={() => handleOnClick()}
         />
-        <div className={cx('text', { inactive: !active, emphasized })}>
-          {children}
+        <div className="data">
+          <Info
+            edited={edited}
+            active={active}
+            name={name}
+            timestamp={timestamp}
+          />
+          {messageToBeReplied &&
+            <Reply
+              active={active}
+              scrollTo={scrollTo}
+              idToReference={messageToBeReplied.id}
+              text={messageToBeReplied.message}
+            />
+          }
+          <div className={cx('text', { inactive: !active, emphasized })}>
+            {children}
+          </div>
         </div>
       </div>
+      <ChatMessageReactions
+        reactions={reactions}
+        active={active}
+      />
     </div>
   );
 };
