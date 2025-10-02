@@ -528,20 +528,20 @@ const buildExternalVideos = result => {
     const v = recording.video;
     const videos = Array.isArray(v) ? v : [v];
     data = videos.map(video => {
-      return {
-        timestamp: parseFloat(video._start_timestamp),
-        clear: parseFloat(video._stop_timestamp),
-        url: video._url,
-        events: video.event.map(event => { 
-          //const attr = getAttr(event);
-          return {
+      const events = Array.isArray(video.event)
+        ? video.event.map(event => ({
             timestamp: parseFloat(event._timestamp),
             type: event._type,
             time: event._time,
             rate: parseFloat(event._rate),
             playing: (event._playing === 'true'),
-          }
-        })
+          }))
+        : [];
+      return {
+        timestamp: parseFloat(video._start_timestamp),
+        clear: parseFloat(video._stop_timestamp),
+        url: video._url,
+        events,
       };
     });
   }
