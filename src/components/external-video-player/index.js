@@ -20,7 +20,8 @@ const intlMessages = defineMessages({
 
 const SYNC_INTERVAL_SECOND = 1;
 const AUTO_PLAY_BLOCK_DETECTION_TIMEOUT_SECONDS = 5;
-const ORCHESTRATOR_INTERVAL_MILLISECOND = 500;
+const ORCHESTRATOR_INTERVAL_MILLISECOND = 200;
+const IGNORE_STOP_CLOSE_TO_START_SECOND = 0.5;
 
 class ExternalVideoPlayer extends Component {
 
@@ -165,6 +166,7 @@ class ExternalVideoPlayer extends Component {
 
     //if (onPlayerReady) onPlayerReady(ID.EXTERNAL_VIDEOS, this);
 
+    this.handleOnPlay();
 
   }
 
@@ -287,7 +289,13 @@ class ExternalVideoPlayer extends Component {
         const {type, time, rate, playing}  = currentVideo.events[index];
 
         logger.debug(`External Video Event: type=${type} time=${time} rate=${rate} playing=${playing}`);
-
+      
+        const nextEvent = currentVideo.events[index+1];
+        if (nextEvent && type == "stop" && nextEvent.type == "play" && (nextEvent.time - time) < IGNORE_STOP_CLOSE_TO_START_SECOND ){
+          logger.debug(`external_video: player skipped "stop" event due to a close "play", interval=${nextEvent.time - time}`);
+          return;
+        }
+      
         switch (type) {
           case "stop":
              this.handleOnPause();
@@ -295,7 +303,7 @@ class ExternalVideoPlayer extends Component {
           case "play":
              this.handleOnPlay();
              break;
-          case "playerUpdate":
+          case "playerUpdate": case "setPlaybackRate": case "seek":
               if (this.playerUpdateTime !== time) {
                 this.lastEventPlaybackRate=rate;
                 this.seekTo(time);
@@ -309,7 +317,7 @@ class ExternalVideoPlayer extends Component {
     }
 
     //this.setPlaybackRate();
-    this.setPlaybackRate(player.primary.playbackRate());
+    this.setPlaybackRate(player.primary.playbackRate()); // Is it necessary??
   }
 
 
