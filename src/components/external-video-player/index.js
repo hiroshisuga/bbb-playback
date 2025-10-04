@@ -270,12 +270,18 @@ class ExternalVideoPlayer extends PureComponent {
         logger.debug(`external_video URLchange ${currentVideo.url} -> ${this.state.urlPlayed}`);
       }
       // Check time consistency every ORCHESTRATOR_INTERVAL_MILLISECOND msec, and fix when drifted away too much
-      if (index && currentVideo.events && currentVideo.events[index] && playing){
-        // thisMovieTimeToBe =            MovieTimeToBe +               (currentPlayerTime - eventTimeStamp) * playRate
-        // [movie time after calibration] [from the start of the movie] [how much sec from the timestamp of a update event]
-        const thisMovieTimeToBe = parseFloat(currentVideo.events[index].time) + (this.time - currentVideo.events[index].timestamp) * currentVideo.events[index].rate;
-        logger.debug(`eventTimeStamp=${currentVideo.events[index].timestamp.toFixed(2)} MovieTimeToBe=${parseFloat(currentVideo.events[index].time).toFixed(2)} currentPlayerTime=${this.time.toFixed(2)} currentMovieTime=${this.player.getCurrentTime().toFixed(2)} rate=${currentVideo.events[index].rate}`);
-        logger.debug(`Calibrated movie time to be=${thisMovieTimeToBe.toFixed(2)} actual movie time=${this.player.getCurrentTime().toFixed(2)} inconsistency=${(thisMovieTimeToBe - this.player.getCurrentTime()).toFixed(2)} Type=${currentVideo.events[index].type}`);
+      if (playing) {
+        let thisMovieTimeToBe;
+        if (index && currentVideo.events && currentVideo.events[index]) {
+          // thisMovieTimeToBe =            MovieTimeToBe +               (currentPlayerTime - eventTimeStamp) * playRate
+          // [movie time after calibration] [from the start of the movie] [how much sec from the timestamp of a update event]
+          thisMovieTimeToBe = parseFloat(currentVideo.events[index].time) + (this.time - currentVideo.events[index].timestamp) * currentVideo.events[index].rate;
+          logger.debug(`eventTimeStamp=${currentVideo.events[index].timestamp.toFixed(2)} MovieTimeToBe=${parseFloat(currentVideo.events[index].time).toFixed(2)} currentPlayerTime=${this.time.toFixed(2)} currentMovieTime=${this.player.getCurrentTime().toFixed(2)} rate=${currentVideo.events[index].rate}`);
+          logger.debug(`Calibrated movie time to be=${thisMovieTimeToBe.toFixed(2)} actual movie time=${this.player.getCurrentTime().toFixed(2)} inconsistency=${(thisMovieTimeToBe - this.player.getCurrentTime()).toFixed(2)} Type=${currentVideo.events[index].type}`);
+        } else if (currentVideo.events.length == 0) {
+          // Just a single video without pause, rate change, or whatever other events
+          thisMovieTimeToBe = this.time - currentVideo.timestamp;
+        }
         this.seekTo(thisMovieTimeToBe);
       }
     //}
