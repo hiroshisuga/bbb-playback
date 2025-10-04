@@ -127,11 +127,9 @@ class ExternalVideoPlayer extends PureComponent {
   }
 
   getCurrentTime() {
-    if (this.player && this.player.getCurrentTime) {
-      return this.player.getCurrentTime();
-    }
+    const time = this.player?.getCurrentTime?.();
+    return typeof time === 'number' ? time : 0;
   }
-
 
   setPlaybackRate(value) {
     //The original way to get the rate from props did not work,
