@@ -259,8 +259,8 @@ class ExternalVideoPlayer extends PureComponent {
 
     const currentVideo = this.whichVideo(videos, this.time);
     const index = getCurrentDataIndex(currentVideo.events, this.time);
-    if (index < 0) {
-      // when the primary player rewinds before the start of external video
+    if (index < 0 || currentVideo.clear < this.time) {
+      // when the primary player rewinds before the start of external video or finishes the video play.
       this.lastEventPlaybackRate = 1;
     }
 
