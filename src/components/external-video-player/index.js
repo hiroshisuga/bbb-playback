@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import ReactPlayer from 'react-player';
 import cx from 'classnames';
 import { defineMessages } from 'react-intl';
@@ -20,10 +20,10 @@ const intlMessages = defineMessages({
 
 const SYNC_INTERVAL_SECOND = 1;
 const AUTO_PLAY_BLOCK_DETECTION_TIMEOUT_SECONDS = 5;
-const ORCHESTRATOR_INTERVAL_MILLISECOND = 200;
+const ORCHESTRATOR_INTERVAL_MILLISECOND = 300;
 const IGNORE_STOP_CLOSE_TO_START_SECOND = 0.5;
 
-class ExternalVideoPlayer extends Component {
+class ExternalVideoPlayer extends PureComponent {
 
   constructor(props) {
     super(props);
