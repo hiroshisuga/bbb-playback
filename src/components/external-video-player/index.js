@@ -270,7 +270,7 @@ class ExternalVideoPlayer extends PureComponent {
         logger.debug(`external_video URLchange ${currentVideo.url} -> ${this.state.urlPlayed}`);
       }
       // Check time consistency every ORCHESTRATOR_INTERVAL_MILLISECOND msec, and fix when drifted away too much
-      if (index && currentVideo.events && currentVideo.events[index] && playing && (currentVideo.events[index].type == "playerUpdate" || currentVideo.events[index].type == "play") ){
+      if (index && currentVideo.events && currentVideo.events[index] && playing){
         // thisMovieTimeToBe =            MovieTimeToBe +               (currentPlayerTime - eventTimeStamp) * playRate
         // [movie time after calibration] [from the start of the movie] [how much sec from the timestamp of a update event]
         const thisMovieTimeToBe = parseFloat(currentVideo.events[index].time) + (this.time - currentVideo.events[index].timestamp) * currentVideo.events[index].rate;
