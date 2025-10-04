@@ -259,6 +259,10 @@ class ExternalVideoPlayer extends PureComponent {
 
     const currentVideo = this.whichVideo(videos, this.time);
     const index = getCurrentDataIndex(currentVideo.events, this.time);
+    if (index < 0) {
+      // when the primary player rewinds before the start of external video
+      this.lastEventPlaybackRate = 1;
+    }
 
     //if (active) {
       if (currentVideo.url !== this.state.urlPlayed) {
@@ -303,9 +307,9 @@ class ExternalVideoPlayer extends PureComponent {
           case "play":
              this.handleOnPlay();
              break;
-          case "playerUpdate": case "setPlaybackRate": case "seek":
+          case "playerUpdate": case "setPlaybackRate": // befor v3
+          case "seek": case "playbackRateChange": // from v3
               if (this.playerUpdateTime !== time) {
-                this.lastEventPlaybackRate=rate;
                 this.seekTo(time);
                 playing ? this.handleOnPlay() : this.handleOnPause()
                 this.playerUpdateTime=time;
@@ -314,10 +318,11 @@ class ExternalVideoPlayer extends PureComponent {
           default:
           ;
         }
+        // Play rate being adjusted every time.
+        this.lastEventPlaybackRate=rate;
     }
-
-    //this.setPlaybackRate();
-    this.setPlaybackRate(player.primary.playbackRate()); // Is it necessary??
+    // multiply the primary player's playing rate
+    this.setPlaybackRate(player.primary.playbackRate());
   }
 
 
