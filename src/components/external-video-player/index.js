@@ -20,7 +20,7 @@ const intlMessages = defineMessages({
 
 const SYNC_INTERVAL_SECOND = 1;
 const AUTO_PLAY_BLOCK_DETECTION_TIMEOUT_SECONDS = 5;
-const ORCHESTRATOR_INTERVAL_MILLISECOND = 300;
+//const ORCHESTRATOR_INTERVAL_MILLISECOND = 300;
 const IGNORE_STOP_CLOSE_TO_START_SECOND = 0.5;
 
 class ExternalVideoPlayer extends PureComponent {
@@ -41,6 +41,8 @@ class ExternalVideoPlayer extends PureComponent {
     this.playerUpdateTime = -1;
     this.primaryPlayerPlaying = false;
     this.lastEventPlaybackRate = 1;
+    this.isOrchestrating = false;
+    this.rafId = null;
 
     this.state = {
       muted: false,
@@ -96,6 +98,9 @@ class ExternalVideoPlayer extends PureComponent {
     this.handleOnBufferEnd = this.handleOnBufferEnd.bind(this);
 
     this.orchestrator = this.orchestrator.bind(this);
+    this.startOrchestrator = this.startOrchestrator.bind(this);
+    this.stopOrchestrator = this.stopOrchestrator.bind(this);
+
     this.autoPlayBlockDetected = this.autoPlayBlockDetected.bind(this);
 
     this.whichVideo = this.whichVideo.bind(this);
@@ -222,13 +227,34 @@ class ExternalVideoPlayer extends PureComponent {
   }
 
   componentDidMount () {
-    this.timer = setInterval(() => this.orchestrator(), ORCHESTRATOR_INTERVAL_MILLISECOND);
+    //this.timer = setInterval(() => this.orchestrator(), ORCHESTRATOR_INTERVAL_MILLISECOND);
+    this.startOrchestrator();
   }
 
   componentWillUnmount () {
-    clearInterval(this.timer);
+    //clearInterval(this.timer);
+    this.stopOrchestrator();
   }
 
+  startOrchestrator() {
+    //logger.debug("startOrchestrator");
+    if (this.isOrchestrating) return;
+    this.isOrchestrating = true;
+    const loop = () => {
+      if (!this.isOrchestrating) return;
+      this.orchestrator();
+      this.rafId = requestAnimationFrame(loop);
+    };
+    this.rafId = requestAnimationFrame(loop);
+  }
+
+  stopOrchestrator() {
+    //logger.debug("stopOrchestrator");
+    this.isOrchestrating = false;
+    if (this.rafId) cancelAnimationFrame(this.rafId);
+    this.rafId = null;
+  }
+    
   whichVideo = (videos, time) => {
     const found = videos.find(video => video.timestamp <= time && video.clear >= time);
     return found ? found : {url: "", timestamp: 0, clear: 0};
