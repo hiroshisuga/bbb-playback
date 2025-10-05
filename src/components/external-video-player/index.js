@@ -172,8 +172,8 @@ class ExternalVideoPlayer extends PureComponent {
     const { playing } = this.state;
 
     if (!playing && this.primaryPlayerPlaying) {
-        this.setState({ playing: true });
-        this.handleFirstPlay();
+      this.setState({ playing: true });
+      this.handleFirstPlay();
     }
   }
 
@@ -199,7 +199,7 @@ class ExternalVideoPlayer extends PureComponent {
       this.setState({ volume: parseFloat(value)});
       logger.debug(`external_video: VolumeChange CV=${this.state.volume.toFixed(2)} NV=${value.toFixed(2)}`);
     }
-    if (this.state.muted != isMuted) {
+    if (this.state.muted !== isMuted) {
       this.setState({ muted: isMuted});
       logger.debug(`external_video: muteChange  CM=${this.state.muted} NM=${isMuted}`);
     }
@@ -238,6 +238,8 @@ class ExternalVideoPlayer extends PureComponent {
     const { /*events, active, primaryPlaybackRate, primaryPlaybackVolume, primaryPlaybackMuted,*/ videos } = this.props;
     const { playing, playbackRate } = this.state;
 
+    if (!player.primary) return;
+
     this.time = player.primary.currentTime();
 
     let primaryPlayerPlaying = true;
@@ -270,13 +272,13 @@ class ExternalVideoPlayer extends PureComponent {
       // Check time consistency every ORCHESTRATOR_INTERVAL_MILLISECOND msec, and fix when drifted away too much
       if (playing) {
         let thisMovieTimeToBe;
-        if (index && currentVideo.events && currentVideo.events[index]) {
+        if (index > -1 && currentVideo.events && currentVideo.events[index]) {
           // thisMovieTimeToBe =            MovieTimeToBe +               (currentPlayerTime - eventTimeStamp) * playRate
           // [movie time after calibration] [from the start of the movie] [how much sec from the timestamp of a update event]
           thisMovieTimeToBe = parseFloat(currentVideo.events[index].time) + (this.time - currentVideo.events[index].timestamp) * currentVideo.events[index].rate;
           logger.debug(`eventTimeStamp=${currentVideo.events[index].timestamp.toFixed(2)} MovieTimeToBe=${parseFloat(currentVideo.events[index].time).toFixed(2)} currentPlayerTime=${this.time.toFixed(2)} currentMovieTime=${this.player.getCurrentTime().toFixed(2)} rate=${currentVideo.events[index].rate}`);
           logger.debug(`Calibrated movie time to be=${thisMovieTimeToBe.toFixed(2)} actual movie time=${this.player.getCurrentTime().toFixed(2)} inconsistency=${(thisMovieTimeToBe - this.player.getCurrentTime()).toFixed(2)} Type=${currentVideo.events[index].type}`);
-        } else if (currentVideo.events.length == 0) {
+        } else if (currentVideo.events && currentVideo.events.length === 0) {
           // Just a single video without pause, rate change, or whatever other events
           thisMovieTimeToBe = this.time - currentVideo.timestamp;
         }
@@ -292,14 +294,14 @@ class ExternalVideoPlayer extends PureComponent {
       return
     }
 
-    if (index && currentVideo.events && currentVideo.events[index] && currentVideo.events[index].type)
+    if (index > -1 && currentVideo.events && currentVideo.events[index] && currentVideo.events[index].type)
     {
         const {type, time, rate, playing}  = currentVideo.events[index];
 
         logger.debug(`External Video Event: type=${type} time=${time} rate=${rate} playing=${playing}`);
       
         const nextEvent = currentVideo.events[index+1];
-        if (nextEvent && type == "stop" && nextEvent.type == "play" && (nextEvent.time - time) < IGNORE_STOP_CLOSE_TO_START_SECOND ){
+        if (nextEvent && type === "stop" && nextEvent.type === "play" && (nextEvent.time - time) < IGNORE_STOP_CLOSE_TO_START_SECOND ){
           logger.debug(`external_video: player skipped "stop" event due to a close "play", interval=${nextEvent.time - time}`);
           return;
         }
