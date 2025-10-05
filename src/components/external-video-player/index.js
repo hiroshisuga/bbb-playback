@@ -352,6 +352,10 @@ class ExternalVideoPlayer extends PureComponent {
         }
         // Play rate being adjusted every time.
         this.lastEventPlaybackRate=rate;
+    } else if (index === -1 && (currentVideo.events && currentVideo.events.length === 0)) {
+      // start video without events, with the playing rate 1 (supposed to be)
+      this.lastEventPlaybackRate = 1;
+      this.handleOnPlay();
     }
     // multiply the primary player's playing rate
     this.setPlaybackRate(player.primary.playbackRate());
