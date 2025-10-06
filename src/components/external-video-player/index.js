@@ -294,6 +294,7 @@ class ExternalVideoPlayer extends PureComponent {
       if (currentVideo.url !== this.state.urlPlayed) {
         this.setState({ urlPlayed: currentVideo.url });
         logger.debug(`external_video URLchange ${currentVideo.url} -> ${this.state.urlPlayed}`);
+        this.setState({ playing: false }); // When swapping to a different video.
       }
       // Check time consistency every ORCHESTRATOR_INTERVAL_MILLISECOND msec, and fix when drifted away too much
       if (playing) {
