@@ -1,6 +1,7 @@
 import { parseFromString } from './data/xml2json';
 import { files as config } from 'config';
 import { getFileType, caseInsensitiveReducer } from './data';
+import { isTldrawWhiteboard } from './tldraw';
 import {
   hasProperty,
   isEmpty,
@@ -56,6 +57,8 @@ const buildAlternates = result => {
   if (!result) return [];
 
   let data = [];
+  const useSvg = isTldrawWhiteboard();
+
   for (const presentation in result) {
     if (hasProperty(result, presentation)) {
       const slides = result[presentation];
@@ -63,9 +66,12 @@ const buildAlternates = result => {
       for (const slide in slides) {
         if (hasProperty(slides, slide)) {
           const text = slides[slide];
+          const slidepath = slide.replace('-', '');
 
           data.push({
-            src: `presentation/${presentation}/${slide}.png`,
+            src: useSvg
+              ? `presentation/${presentation}/svgs/${slidepath}.svg`
+              : `presentation/${presentation}/${slide}.png`,
             text,
           });
         }
@@ -190,10 +196,10 @@ const buildSlides = image => {
       timestamps.forEach(timestamp => {
         slides.push({
           id: slideId,
-          height: parseInt(img._height),
+          height: parseInt(img._height, 10),
           src,
           timestamp,
-          width: parseInt(img._width),
+          width: parseInt(img._width, 10),
         });
       });
     });
@@ -341,41 +347,49 @@ const buildShapes = result => {
     data.slides = buildSlides(image);
     data.thumbnails = buildThumbnails(data.slides);
     data.canvases = buildCanvases(g, data.slides);
+    data.slides = data.slides.filter(slide => !slide.src.includes(ID.DESKSHARE));
+  } else {
+    data.slides = [];
+    data.thumbnails = [];
+    data.canvases = [];
   }
-  data.slides = data.slides.filter(slide => !slide.src.includes(ID.DESKSHARE));
+
   return data;
 };
 
 const buildTldraw = result => {
   if (!result) return [];
 
-  let bbb_version = null;
-  if (result['bbb_version']) {
-    bbb_version = result['bbb_version'];
-    delete result['bbb_version'];
+  const { bbb_version, ...slides } = result;
+
+  if (Object.keys(slides).length === 0) {
+    if (bbb_version) {
+      return [{
+        data: [],
+        bbb_version,
+      }];
+    }
+    return [];
   }
 
-  let tldraw = [];
-  tldraw = Object.keys(result).map(i => {
-    let data = result[i].shapes.map(shape => {
-      return {
-        clear: shape.undo,
-        id: shape.id,
-        shape: shape.shape_data,
-        timestamp: shape.timestamp,
-      }
-    })
+  const tldraw = Object.entries(slides).map(([id, slideData]) => {
+    const data = slideData.shapes.map(shape => ({
+      clear: shape.undo,
+      id: shape.id,
+      shape: shape.shape_data,
+      timestamp: shape.timestamp,
+    }));
 
     return {
       data,
-      timestamp: result[i].timestamp,
-      id: i,
-      bbb_version: bbb_version,
+      timestamp: slideData.timestamp,
+      id,
+      bbb_version,
     };
-  })
+  });
 
   return tldraw;
-}
+};
 
 const buildLayout = result => {
   const { recording } = result;
@@ -395,10 +409,11 @@ const buildLayout = result => {
 
 const buildPanzooms = result => {
   let data = [];
+  let tldraw = false;
   const { recording } = result;
 
   if (hasProperty(recording, 'event')) {
-    const tldraw = recording._tldraw === 'true';
+    tldraw = recording._tldraw === 'true';
     data = convertToArray(recording.event).map(panzoom => {
       const viewbox = getNumbers(panzoom.viewBox);
       return {
@@ -409,17 +424,18 @@ const buildPanzooms = result => {
         height: viewbox.shift(),
       };
     });
-    data.tldraw = tldraw;
   }
 
-  return data;
+  return { data, tldraw };
 };
 
 const buildCursor = result => {
   let data = [];
+  let tldraw = false;
   const { recording } = result;
 
   if (hasProperty(recording, 'event')) {
+    tldraw = recording._tldraw === 'true';
     data = convertToArray(recording.event).map(cursor => {
       const position = getNumbers(cursor.cursor);
 
@@ -429,25 +445,9 @@ const buildCursor = result => {
         y: position.shift(),
       };
     });
-    data.tldraw = recording._tldraw === 'true';
   }
 
-  return data;
-};
-
-const clearHyperlink = message => {
-  const regex = /<a href="(.*)" rel="nofollow"><u>\1<\/u><\/a>/g;
-
-  return message.replace(regex, '$1');
-};
-
-const decodeXML = message => {
-  return message
-    .replace(/&(quot|#34);/g, '"')
-    .replace(/&(amp|#38);/g, '&')
-    .replace(/&(apos|#39);/g, "'")
-    .replace(/&(lt|#60);/g, '<')
-    .replace(/&(gt|#62);/g, '>');
+  return { data, tldraw };
 };
 
 const getInitials = name => {
@@ -471,7 +471,7 @@ const buildChat = result => {
     const { chattimeline } = popcorn;
     data = convertToArray(chattimeline).map(chat => {
       const clear = chat._out ? parseFloat(chat._out) : -1;
-      const message = decodeXML(clearHyperlink(chat._message));
+      const message = chat._message;
       const initials = getInitials(chat._name);
       const emphasized = chat._chatEmphasizedText === 'true';
       const moderator = chat._senderRole === ROLES.MODERATOR;
@@ -479,15 +479,14 @@ const buildChat = result => {
       // Normalize reactions to always be an array
       const reactionsList = chat.reactions ? convertToArray(chat.reactions.reaction) : [];
       const reactions = reactionsList.map((messageReaction) => ({
-          emoji: messageReaction._emoji,
-          count: messageReaction._count,
-        }),
+        emoji: messageReaction._emoji,
+        count: messageReaction._count,
+      }),
       );
       return {
         clear,
         id: chat._id,
         emphasized,
-        hyperlink: message !== chat._message,
         initials,
         name: chat._name,
         message,
@@ -649,7 +648,7 @@ const addAlternatesToThumbnails = (thumbnails, alternates) => {
   });
 };
 
-const mergeMessages = (chat, polls, videos) => {
+const mergeMessages = (chat = [], polls = [], videos = []) => {
   return [
     ...chat,
     ...polls,
@@ -661,7 +660,6 @@ export {
   addAlternatesToThumbnails,
   build,
   buildStyle,
-  decodeXML,
   getAttr,
   getId,
   getNumbers,

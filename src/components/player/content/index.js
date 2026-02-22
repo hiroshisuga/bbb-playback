@@ -3,7 +3,7 @@ import cx from 'classnames';
 import Presentation from 'components/presentation';
 import TldrawPresentation from 'components/tldraw';
 import TldrawPresentationV2 from 'components/tldraw_v2';
-import { getTldrawBbbVersion } from 'utils/tldraw';
+import { getTldrawBbbVersion, isTldrawWhiteboard as isTldraw } from 'utils/tldraw';
 import { useCurrentInterval, useShouldShowScreenShare } from 'components/utils/hooks';
 import Screenshare from 'components/screenshare';
 import ExternalVideoPlayer from 'components/external-video-player';
@@ -32,9 +32,7 @@ const Content = ({
 
   if (layout.single) return null;
 
-  const isTldrawWhiteboard = storage.tldraw.length ||
-                             storage.panzooms.tldraw ||
-                             storage.cursor.tldraw;
+  const isTldrawWhiteboard = isTldraw();
 
   const RenderExternalVideo = () => {
     const intl = useIntl();
@@ -56,7 +54,7 @@ const Content = ({
   }
 
   let presentation;
-  
+
   if (isTldrawWhiteboard) {
     const bbbVersion = getTldrawBbbVersion(index);
 
@@ -83,7 +81,7 @@ const Content = ({
         {presentation}
         {layout.screenshare ? (
           // video-js doesn't mount properly when not mounted in time
-          <span style={!shouldShowScreenshare ?{
+          <span style={!shouldShowScreenshare ? {
             display: 'none',
             width: '100%',
             height: '100%'
@@ -93,7 +91,7 @@ const Content = ({
           }}>
             <Screenshare />
           </span>
-        ): null}
+        ) : null}
         {layout.external_videos ? RenderExternalVideo() : null}
       </div>
       <div className={cx('bottom-content', { 'inactive': fullscreen })}>

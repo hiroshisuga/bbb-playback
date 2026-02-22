@@ -1,4 +1,6 @@
 import storage from 'utils/data/storage';
+import { ID } from 'utils/constants';
+import { DefaultColorThemePalette } from '@bigbluebutton/tldraw';
 
 /**
  * Retrieves the BBB version for a specific Tldraw instance from storage.
@@ -7,7 +9,12 @@ import storage from 'utils/data/storage';
  * @returns {(string|undefined)} The BBB version associated with the Tldraw instance at the specified index. 
  *                               Returns undefined if no instance is found at the index.
  */
-const getTldrawBbbVersion = (index) => storage.tldraw[index]?.bbb_version;
+const getTldrawBbbVersion = (index) => {
+  if (index === -1) {
+    return storage.tldraw[0]?.bbb_version;
+  }
+  return storage.tldraw[index]?.bbb_version;
+};
 
 /**
  * Retrieves Tldraw data for a given slide index and page number.
@@ -98,7 +105,7 @@ const createTldrawImageAsset = (assetId, imageUrl, scaledWidth, scaledHeight) =>
 const createTldrawBackgroundShape = (assetId, curPageId, scaledWidth, scaledHeight) => {
   return {
     x: 1,
-    y: 1, 
+    y: 1,
     rotation: 0,
     isLocked: true,
     opacity: 1,
@@ -160,6 +167,42 @@ const createTldrawCursorShape = (x, y, curPageId) => {
   }
 }
 
+const setupColorThemePaletteOverrides = () => {
+  // Override the default color theme to use our custom palette with more vibrant yellow highlights
+  DefaultColorThemePalette.lightMode.black.highlight = {
+    srgb: '#FFFF00',
+    p3: 'color(display-p3 1 1 0)',
+  };
+  DefaultColorThemePalette.darkMode.black.highlight = {
+    srgb: '#FFFF00',
+    p3: 'color(display-p3 1 1 0)',
+  };
+  // Override the default yellow color to be a more vibrant yellow
+  DefaultColorThemePalette.lightMode.yellow = {
+    solid: '#FFFF00',
+    highlight: {
+      srgb: '#FFFF00',
+      p3: 'color(display-p3 1 1 0)',
+    },
+  };
+  DefaultColorThemePalette.darkMode.yellow = {
+    solid: '#FFFF00',
+    highlight: {
+      srgb: '#FFFF00',
+      p3: 'color(display-p3 1 1 0)',
+    },
+  };
+};
+
+const isTldrawWhiteboard = () => {
+  const panzooms = storage.data[ID.PANZOOMS];
+  const cursor = storage.data[ID.CURSOR];
+
+  return (storage.tldraw && storage.tldraw.length > 0) ||
+    (panzooms && panzooms.tldraw) ||
+    (cursor && cursor.tldraw);
+};
+
 export {
   getTldrawBbbVersion,
   getTldrawData,
@@ -167,4 +210,6 @@ export {
   createTldrawImageAsset,
   createTldrawBackgroundShape,
   createTldrawCursorShape,
+  isTldrawWhiteboard,
+  setupColorThemePaletteOverrides,
 };

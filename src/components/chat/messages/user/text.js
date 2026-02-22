@@ -1,39 +1,27 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Linkify from 'linkify-react';
-import cx from 'classnames';
+import DOMPurify from 'dompurify';
 
 const propTypes = {
   active: PropTypes.bool,
-  hyperlink: PropTypes.bool,
   text: PropTypes.string,
 };
 
 const defaultProps = {
   active: false,
-  hyperlink: false,
   text: '',
 };
 
 const Text = ({
   active,
-  hyperlink,
   text,
 }) => {
-  if (hyperlink) {
-    const options = {
-      className: cx('linkified', { inactive: !active }),
-      target: '_blank',
-    };
-
-    return (
-      <Linkify options={options}>
-        {text.replace(/(\S)(https?:\/\/)/g, '$1 $2')}
-      </Linkify>
-    );
-  }
-
-  return <>{text}</>;
+  return (
+    <div
+      className='text-vanilla'
+      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(text) }}
+    />
+  );
 };
 
 Text.propTypes = propTypes;

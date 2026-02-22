@@ -35,6 +35,20 @@ const EVENTS = [
   'waiting',
 ];
 
+// Safely call play() on a media element, catching the AbortError that
+// occurs when pause() is called before the play() promise resolves.
+// See: https://developer.chrome.com/blog/play-request-was-interrupted
+const safePlay = (mediaElement) => {
+  const playPromise = mediaElement.play();
+  if (playPromise !== undefined) {
+    playPromise.catch((error) => {
+      if (error.name !== 'AbortError') {
+        logger.error('play error', error);
+      }
+    });
+  }
+};
+
 export default class Synchronizer {
   constructor(primary, secondary/*, externalVideos = null*/) {
     this.primary = primary;
@@ -60,7 +74,7 @@ export default class Synchronizer {
       this.secondary.on(status, () => this.status.secondary = status);
     });
 
-    this.primary.on('play', () => this.secondary.play());
+    this.primary.on('play', () => safePlay(this.secondary));
     this.primary.on('pause', () => this.secondary.pause());
 
     this.primary.on('seeking', () => {
@@ -83,7 +97,7 @@ export default class Synchronizer {
     this.primary.on('canplay', () => {
       if (this.synching) {
         this.synching = false;
-        this.primary.play();
+        safePlay(this.primary);
       }
     });
 
@@ -97,7 +111,7 @@ export default class Synchronizer {
     this.secondary.on('canplay', () => {
       if (this.synching) {
         this.synching = false;
-        this.primary.play();
+        safePlay(this.primary);
       }
     });
 

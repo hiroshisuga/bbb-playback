@@ -47,7 +47,7 @@ const hasLoaded = () => {
   const stored = Object.keys(DATA).length;
   const data = Object.keys(files).length;
 
-  if (stored > data) {
+  if (stored >= data) {
     logger.debug(ID.STORAGE, STATE.LOADED);
     STATUS = STATE.LOADED;
 
@@ -83,7 +83,7 @@ const fetchFile = (data, recordId, onUpdate, onLoaded, onError) => {
     }
   }).then(value => {
     build(file, value).then(content => {
-      if (content) logger.debug(ID.STORAGE, 'builded', file);
+      if (content) logger.debug(ID.STORAGE, 'built', file);
       DATA[data] = content;
       onUpdate(data);
       if (hasLoaded()) onLoaded();
@@ -198,7 +198,8 @@ const storage = {
     return DATA[ID.VIDEOS];
   },
   get cursor() {
-    return DATA[ID.CURSOR];
+    const result = DATA[ID.CURSOR];
+    return result ? result.data : [];
   },
   get media() {
     return DATA[ID.MEDIA];
@@ -221,7 +222,8 @@ const storage = {
     return DATA[ID.NOTES];
   },
   get panzooms() {
-    return DATA[ID.PANZOOMS];
+    const result = DATA[ID.PANZOOMS];
+    return result ? result.data : [];
   },
   get screenshare() {
     return DATA[ID.SCREENSHARE];

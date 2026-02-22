@@ -18,7 +18,8 @@ import storage from 'utils/data/storage';
 import './index.scss';
 import {
   getTldrawData, getViewBox, createTldrawImageAsset,
-  createTldrawBackgroundShape, createTldrawCursorShape
+  createTldrawBackgroundShape, createTldrawCursorShape,
+  setupColorThemePaletteOverrides
 } from 'utils/tldraw';
 import { buildFileURL } from 'utils/data';
 import { isEmpty } from 'utils/data/validators';
@@ -26,6 +27,8 @@ import getCursor from './cursor';
 
 const MAX_IMAGE_WIDTH = 1440;
 const MAX_IMAGE_HEIGHT = 1080;
+
+setupColorThemePaletteOverrides();
 
 const intlMessages = defineMessages({
   aria: {
@@ -64,6 +67,12 @@ const SlideData = (tldrawAPI) => {
   assets[`slide-background-asset-${id}`] = createTldrawImageAsset(assetId, buildFileURL(src), scaledWidth, scaledHeight)
   shapes["slide-background-shape"] = createTldrawBackgroundShape(assetId, curPageId, scaledWidth, scaledHeight)
 
+  const { x, y } = getCursor(currentCursorIndex);
+
+  if (!(x === -1 || y === -1)) {
+    shapes['cursor'] = createTldrawCursorShape(x, y, curPageId);
+  }
+
   if (index === -1 || isEmpty(interval)) return { assets, shapes, scaleRatio }
 
   for (let i = 0; i < interval.length; i++) {
@@ -76,16 +85,10 @@ const SlideData = (tldrawAPI) => {
         shape,
       } = tldrawData[i];
 
-      shape.parentId = tldrawAPI?.getCurrentPageId();
-      shapes[shape.id] = shape;
+      const newShape = { ...shape };
+      newShape.parentId = tldrawAPI?.getCurrentPageId();
+      shapes[newShape.id] = newShape;
     }
-  }
-
-  const camera = tldrawAPI?.getCamera();
-  const { x, y } = getCursor(currentCursorIndex, camera);
-
-  if (!(x === -1 || y === -1)) {
-    shapes['cursor'] = createTldrawCursorShape(x, y, curPageId);
   }
 
   return { assets, shapes, scaleRatio }
