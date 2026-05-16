@@ -11,6 +11,10 @@ const player = {
   get screenshare() {
     return PLAYERS[ID.SCREENSHARE];
   },
+  get external_videos() {
+    //Not really used..
+    return PLAYERS[ID.EXTERNAL_VIDEOS];
+  },
   get synchronizer() {
     return SYNCHRONIZER;
   },

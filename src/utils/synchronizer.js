@@ -50,10 +50,14 @@ const safePlay = (mediaElement) => {
 };
 
 export default class Synchronizer {
-  constructor(primary, secondary) {
+  constructor(primary, secondary/*, externalVideos = null*/) {
     this.primary = primary;
     this.secondary = secondary;
     this.listeners = [];
+
+    //if (externalVideos) {
+    //  this.externalVideos = externalVideos;  
+    //}
 
     this.status = {
       primary: 'waiting',
