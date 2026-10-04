@@ -41,5 +41,6 @@
   "player.thumbnails.wrapper.aria": "サムネイルエリア",
   "player.webcams.wrapper.aria": "ウェブカムエリア",
   "player.video.wrapper.aria": "ビデオエリア",
-  "player.externalVideo.autoPlayWarning": "音声の再生には許可が必要です"
+  "player.externalVideo.autoPlayWarning": "動画が始まらない場合は、動画内の再生ボタンを押してください。",
+  "player.externalVideo.error": "外部動画を再生できませんでした（エラー: {code}）。"
 }

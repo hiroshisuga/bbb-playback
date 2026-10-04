@@ -533,15 +533,14 @@ const buildExternalVideos = result => {
     const v = recording.video;
     const videos = Array.isArray(v) ? v : [v];
     data = videos.map(video => {
-      const events = Array.isArray(video.event)
-        ? video.event.map(event => ({
-            timestamp: parseFloat(event._timestamp),
-            type: event._type,
-            time: event._time,
-            rate: parseFloat(event._rate),
-            playing: (event._playing === 'true'),
-          }))
-        : [];
+      const rawEvents = video.event ? (Array.isArray(video.event) ? video.event : [video.event]) : [];
+      const events = rawEvents.map(event => ({
+        timestamp: parseFloat(event._timestamp),
+        type: event._type,
+        time: event._time,
+        rate: parseFloat(event._rate),
+        playing: (event._playing === 'true'),
+      })).sort((a, b) => a.timestamp - b.timestamp);
       return {
         timestamp: parseFloat(video._start_timestamp),
         clear: parseFloat(video._stop_timestamp),
@@ -666,6 +665,7 @@ export {
   addAlternatesToThumbnails,
   build,
   buildStyle,
+  buildExternalVideos,
   getAttr,
   getId,
   getNumbers,

@@ -1,3 +1,6 @@
+// These data conversion tests do not need the tldraw renderer.
+jest.mock('./tldraw', () => ({ isTldrawWhiteboard: () => false }));
+
 import {
   buildStyle,
   getAttr,
@@ -101,4 +104,15 @@ it('gets a numeric array from a string', () => {
   expect(getNumbers('')).toEqual([]);
   expect(getNumbers(' ')).toEqual([]);
   expect(getNumbers()).toEqual([]);
+});
+
+it('retains a single external video event from parsed XML', () => {
+  const { buildExternalVideos } = require('./builder');
+  const result = buildExternalVideos({ recording: { video: {
+    _start_timestamp: '10', _stop_timestamp: '100', _url: 'video',
+    event: { _timestamp: '20', _type: 'stop', _time: '10', _rate: '1', _playing: 'false' },
+  } } });
+  expect(result[0].events).toEqual([
+    { timestamp: 20, type: 'stop', time: '10', rate: 1, playing: false },
+  ]);
 });
