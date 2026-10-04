@@ -154,8 +154,8 @@ export default class ExternalVideoPlayer extends PureComponent {
 
     const playing = this.ready && target.playing && !primary.paused()
       && !primary.ended() && !primary.seeking() && !this.primaryWaiting;
-    // Meeting-time speed is deliberately fixed at 1x; viewer speed is supported.
-    const playbackRate = primary.playbackRate();
+    // Timeline positions use recording seconds; actual playback also follows viewer speed.
+    const playbackRate = target.rate * primary.playbackRate();
     const next = { playing, playbackRate, volume: primary.volume(), muted: primary.muted() };
     const changed = Object.keys(next).some(key => next[key] !== this.state[key]);
     if (changed) {

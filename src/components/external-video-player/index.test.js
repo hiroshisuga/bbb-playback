@@ -102,3 +102,25 @@ it('does not keep seeking or show a start warning after the external video ends'
   component.handlePrimaryEvent({ type: 'seeked' });
   expect(component.player.seekTo).toHaveBeenLastCalledWith(5, 'seconds', true);
 });
+it('multiplies meeting and viewer speeds and restores them on rewind', () => {
+  component.props = { videos: [{ ...video, events: [
+    { timestamp: 20, type: 'playbackRateChange', rate: 2, time: 10, playing: true },
+    { timestamp: 40, type: 'playbackRateChange', rate: 0.5, time: 50, playing: true },
+  ] }] };
+  rate = 2; time = 30; component.sync(); component.handleReady();
+  expect(component.state.playbackRate).toBe(4);
+  expect(component.player.seekTo).toHaveBeenLastCalledWith(30, 'seconds', true);
+  time = 50; component.handlePrimaryEvent({ type: 'seeked' });
+  expect(component.state.playbackRate).toBe(1);
+  expect(component.player.seekTo).toHaveBeenLastCalledWith(55, 'seconds', true);
+  paused = true; time = 15; component.handlePrimaryEvent({ type: 'seeked' });
+  expect(component.state.playbackRate).toBe(2);
+  expect(component.player.seekTo).toHaveBeenLastCalledWith(5, 'seconds', false);
+});
+it('seeks to the URL offset before the first recorded play', () => {
+  component.props = { videos: [{ ...video, url: `${video.url}&t=60s`, events: [
+    { timestamp: 12, type: 'play', time: 62, rate: 1, playing: true },
+  ] }] };
+  time = 10; paused = true; component.sync(); component.handleReady();
+  expect(component.player.seekTo).toHaveBeenLastCalledWith(60, 'seconds', false);
+});
