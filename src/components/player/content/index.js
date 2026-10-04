@@ -30,29 +30,11 @@ const Content = ({
   } = useCurrentInterval(storage.tldraw);
 
   const { showScreenshare } = useLayoutSwap();
+  const intl = useIntl();
 
   if (layout.single || hidePresentation) return null;
 
   const isTldrawWhiteboard = isTldraw();
-
-  const RenderExternalVideo = () => {
-    const intl = useIntl();
-    const { external_videos } = storage;
-
-    return (
-      <ExternalVideoPlayer
-         //active={currentContent === ID.EXTERNAL_VIDEOS}
-         intl={intl}
-         videos={external_videos}
-         //onPlayerReady={this.handlePlayerReady}
-         //events={events}
-         //primaryPlaybackRate={primaryPlaybackRate}
-         //primaryPlaybackVolume={primaryPlaybackVolume}
-         //primaryPlaybackMuted={primaryPlaybackMuted
-         //getCurrentPlayerTime={getTime}
-      />
-    );
-  }
 
   let presentation;
 
@@ -93,7 +75,9 @@ const Content = ({
             <Screenshare />
           </span>
         ) : null}
-        {layout.external_videos ? RenderExternalVideo() : null}
+        {layout.external_videos ? (
+          <ExternalVideoPlayer intl={intl} videos={storage.external_videos} />
+        ) : null}
       </div>
       <div className={cx('bottom-content', { 'inactive': fullscreen })}>
         <Thumbnails
