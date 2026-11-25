@@ -46,10 +46,14 @@ const hasFetched = () => {
   return false;
 }
 
+// Every file and the media probe must be in. Counting the stored keys is not
+// enough: the media probe is stored in the same object, so the count could
+// reach the number of files with one of them still missing
 const hasLoaded = () => {
-  // Derived datasets (such as externalVideos) are not separate file loads.
-  if (Object.keys(files).every(data => Object.hasOwn(DATA, data))
-    && Object.hasOwn(DATA, ID.MEDIA)) {
+  const filesLoaded = Object.keys(files).every(data => Object.hasOwn(DATA, data));
+  const mediaLoaded = Object.hasOwn(DATA, ID.MEDIA);
+
+  if (filesLoaded && mediaLoaded) {
     // Resolve legacy intervals only after JSON and SVG have both loaded.
     DATA[ID.EXTERNAL_VIDEOS] = buildExternalVideos(EXTERNAL_VIDEO_JSON, DATA[ID.SHAPES]?.slides);
     logger.debug(ID.STORAGE, STATE.LOADED);
@@ -105,18 +109,16 @@ const fetchFile = (data, recordId, onUpdate, onLoaded, onError) => {
 const fetchMedia = (recordId, onUpdate, onLoaded, onError) => {
   const fetches = medias.map(type => {
     const url = buildFileURL(`video/webcams.${type}`, recordId);
-    return fetch(url, { method: 'HEAD' });
+    // A probe failing at the network level must not discard the other formats
+    return fetch(url, { method: 'HEAD' }).catch(error => {
+      logger.warn(ID.STORAGE, ID.MEDIA, type, error);
+      return null;
+    });
   });
 
   Promise.all(fetches).then(responses => {
-    const media = [];
-    responses.forEach(response => {
-      const { ok, url } = response;
-      if (ok) {
-        logger.debug(ID.STORAGE, ID.MEDIA, response);
-        media.push(medias.find(type => url.endsWith(type)));
-      }
-    });
+    const media = medias.filter((type, index) => responses[index]?.ok);
+    logger.debug(ID.STORAGE, ID.MEDIA, media);
 
     if (media.length > 0) {
       DATA[ID.MEDIA] = media;
@@ -145,6 +147,9 @@ const tryMediaFallback = (recordId, onUpdate, onLoaded, onError) => {
     } else {
       onError(ERROR.NOT_FOUND);
     }
+  }).catch(error => {
+    logger.warn(ID.STORAGE, ID.MEDIA, error);
+    onError(ERROR.NOT_FOUND);
   });
 };
 

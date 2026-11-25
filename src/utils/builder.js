@@ -1,7 +1,6 @@
 import { parseFromString } from './data/xml2json';
 import { files as config } from 'config';
 import { getFileType, caseInsensitiveReducer } from './data';
-import { isTldrawWhiteboard } from './tldraw';
 import {
   hasProperty,
   isEmpty,
@@ -57,7 +56,6 @@ const buildAlternates = result => {
   if (!result) return [];
 
   let data = [];
-  const useSvg = isTldrawWhiteboard();
 
   for (const presentation in result) {
     if (hasProperty(result, presentation)) {
@@ -68,12 +66,12 @@ const buildAlternates = result => {
           const text = slides[slide];
           const slidepath = slide.replace('-', '');
 
-          data.push({
-            src: useSvg
-              ? `presentation/${presentation}/svgs/${slidepath}.svg`
-              : `presentation/${presentation}/${slide}.png`,
-            text,
-          });
+          // Slides are PNGs, or SVGs in tldraw recordings (BBB 2.6+), which is
+          // only known once the tldraw files are loaded: match either
+          data.push(
+            { src: `presentation/${presentation}/${slide}.png`, text },
+            { src: `presentation/${presentation}/svgs/${slidepath}.svg`, text },
+          );
         }
       }
     }
@@ -216,9 +214,11 @@ const buildThumbnails = slides => {
 
   return slides.reduce((result, slide) => {
     const {
+      height,
       id,
       src,
       timestamp,
+      width,
     } = slide;
 
     if (src.includes(ID.DESKSHARE)) {
@@ -235,9 +235,11 @@ const buildThumbnails = slides => {
         });
     } else {
       result.push({
+        height,
         id,
         src: src.replace(prefix, url),
         timestamp,
+        width,
       });
     }
 

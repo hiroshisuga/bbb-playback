@@ -1,6 +1,6 @@
 {
   "name": "bbb-playback",
-  "version": "5.4.8",
+  "version": "5.5.0",
   "homepage": "/playback/presentation/2.3",
   "dependencies": {
     "@bigbluebutton/tldraw": "^2.0.0-alpha.36",
@@ -33,7 +33,7 @@
     "@svgr/webpack": "6.5.1",
     "resolve-url-loader": "5.0.0",
     "postcss": "8.5.23",
-    "serialize-javascript": "7.0.5",
+    "serialize-javascript": "7.1.4",
     "uuid": "11.1.1",
     "@tootallnate/once": "2.0.1",
     "webpack-dev-server": "4.15.2"
@@ -79,6 +79,10 @@
     "url": "https://github.com/bigbluebutton/bbb-playback/issues"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
+  },
+  "allowScripts": {
+    "core-js": false,
+    "core-js-pure": false
   }
 }
